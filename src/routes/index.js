@@ -11,6 +11,7 @@ module.exports = function() {
 
 	app.post('/AddNominee', userController.AddNominee);
 	app.post('/UpdateNominee', userController.UpdateNominee);
+	//app.post('/UpdateNominee', userController.UpdateNominee);
 
 }
 
