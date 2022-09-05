@@ -107,7 +107,7 @@ userModel.getUser = async function (body) {
 			if(result.length > 0) {
 				
 				deferred.resolve(
-					{ status: true , message : { data : result } }
+					{ status: true ,  data : result  }
 				);
 					
 			} else {
