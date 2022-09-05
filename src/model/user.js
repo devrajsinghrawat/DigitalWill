@@ -94,29 +94,88 @@ userModel.updateUser = async function (body) {
 
 
 userModel.getUser = async function (body) {
+    let deferred 		= q.defer();	
 
-    let deferred = q.defer(),
-    sql = "SELECT * from users WHERE UserPublicKey = ?";
-    pool.query(sql, [body.UserPublicKey], async function (error, result) {
-        if (error) {
+	let sql = "SELECT `UserPublicKey`, `Name`, `Email`, `MobileNumber`, `SetReminders`, `TotalDeposits`, `LastCheck`, `CreatedAt` FROM `users`";
+	
+	pool.query(sql, [], function (error, result) {
+		if (error) {
 			console.log(error);
-            deferred.reject(error);
-        } else {					
-			console.log('result111', result);
-			deferred.resolve(
-				{ 	status: true , 
-					data : { 
-						"UserPublicKey" : result[0].UserPublicKey,
-						"Name"          : result[0].Name,
-						"Email"         : result[0].Email,
-						"MobileNumber"	: result[0].MobileNumber							
-					}					
-				} 
-			);	           
-        }
-    })
+			deferred.reject(error);
+		} else {	
+			console.log("mmm<<<<<",result);		
+			if(result.length > 0) {
+				
+				deferred.resolve(
+					{ status: true , message : { data : result } }
+				);
+					
+			} else {
+				deferred.resolve(
+					{ status: false , message : "No Record Found !!" }
+				);
+			}
+		}
+	});	   
+
     return deferred.promise;
 }
+
+userModel.UserNominee = async function (body) {
+    let deferred 		= q.defer();	
+
+	let sql = "SELECT * FROM nominee where UserPublicKey = ?";
+	
+	pool.query(sql, [body.UserPublicKey], function (error, result) {
+		if (error) {
+			console.log(error);
+			deferred.reject(error);
+		} else {	
+			if(result.length > 0) {
+				
+				deferred.resolve(
+					{ status: true , message : { data : result } }
+				);
+					
+			} else {
+				deferred.resolve(
+					{ status: false , message : "No Record Found !!" }
+				);
+			}
+		}
+	});	   
+
+    return deferred.promise;
+}
+
+
+userModel.UserNomineeByUsers = async function (body) {
+    let deferred 		= q.defer();	
+
+	let sql = "SELECT * FROM nominee where NomineePublicKey = ?";
+	
+	pool.query(sql, [body.UserPublicKey], function (error, result) {
+		if (error) {
+			console.log(error);
+			deferred.reject(error);
+		} else {	
+			if(result.length > 0) {
+				
+				deferred.resolve(
+					{ status: true , message : { data : result } }
+				);
+					
+			} else {
+				deferred.resolve(
+					{ status: false , message : "No Record Found !!" }
+				);
+			}
+		}
+	});	   
+
+    return deferred.promise;
+}
+
 
 
 userModel.AddNominee = async function (body) {

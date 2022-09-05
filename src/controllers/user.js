@@ -133,4 +133,51 @@ user.UpdateNominee = function (req, res, next) {
 	}
 }
 
+user.UserNominee = function (req, res, next) {
+	if (req.body.UserPublicKey) {
+		userModel.UserNominee(req.body).then(function (result) {
+			console.log(result);
+			if (result) {
+				helper.successHandler(res, {
+					data: result.data
+				}, 200);
+			} else {
+				helper.errorHandler(res, {
+					status: false,
+					message: result.message
+				}, 500);
+			}
+		});
+	} else {
+		helper.errorHandler(res, {
+			status: false,
+			message: "Something went wrong !!"
+		}, 500);
+	}
+}
+
+user.UserNomineeByUsers = function (req, res, next) {
+	if (req.body.UserPublicKey) {
+		userModel.UserNomineeByUsers(req.body).then(function (result) {
+			console.log(result);
+			if (result) {
+				helper.successHandler(res, {
+					data: result.data
+				}, 200);
+			} else {
+				helper.errorHandler(res, {
+					status: false,
+					message: result.message
+				}, 500);
+			}
+		});
+	} else {
+		helper.errorHandler(res, {
+			status: false,
+			message: "Something went wrong !!"
+		}, 500);
+	}
+}
+
+
 module.exports = user;
