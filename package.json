@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/devrajsinghrawat/DigitalWill#readme",
   "devDependencies": {
-    "hardhat": "^2.11.0"
+    "hardhat": "^2.11.0",
+    "@nomicfoundation/hardhat-toolbox": "^1.0.2"
   }
 }
