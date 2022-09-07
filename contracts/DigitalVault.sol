@@ -1,9 +1,3 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-
-import "@openzeppelin/contracts/security/Pausable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-
 contract DigitalVault is Ownable, Pausable {
   // address public owner;
   mapping (address => uint) public userBalance;
@@ -60,12 +54,12 @@ contract DigitalVault is Ownable, Pausable {
     if (netShare > 100)       // Net %Share check  
       revert InvalidShare("invalid share", _s);  
 
-    NomineeDetails[] storage nominee = userNomineeData[msg.sender];
+    NomineeDetails[] storage nominee = userNomineeData[_msgSender()];
     nominee.push(NomineeDetails(_n, _s));
-    nomineeUserDetails[_n] = msg.sender; // Set Nominee and User link
+    nomineeUserDetails[_n] = _msgSender(); // Set Nominee and User link
     emit nomineeAdded(_n);
     // OR
-    // userNomineeData[msg.sender].push(NomineeDetails(_n, _s));
+    // userNomineeData[_msgSender()].push(NomineeDetails(_n, _s));
   }
 
   /*
@@ -84,8 +78,8 @@ contract DigitalVault is Ownable, Pausable {
       revert ZeroAmountError(msg.value);
 
   // Update user Balance 
-    userBalance[tx.origin] = msg.value;
-    emit fundDeposited(tx.origin, msg.value, block.number);
+    userBalance[_msgSender()] = msg.value;
+    emit fundDeposited(_msgSender(), msg.value, block.number);
   }
 
   /*
@@ -99,7 +93,7 @@ contract DigitalVault is Ownable, Pausable {
     // Function should check whether the sender is in nomineeUserDetails mapping or not
     // Function should Update the OwnerBalance mapping
     // Function should emit event FundWithdrawal(sender, amount)
-    // Get the user details using nomineeUserDetails[msg.sender] and then check the %share he owns userNomineeData[user][msg.sender]
+    // Get the user details using nomineeUserDetails[_msgSender()] and then check the %share he owns userNomineeData[user][_msgSender()]
 
   }
 
@@ -145,7 +139,7 @@ contract DigitalVault is Ownable, Pausable {
  * @return {tuple(address, uint)} get the nominee details for the user
  */
   function getNominee() public view returns( NomineeDetails[] memory) {
-     return userNomineeData[msg.sender];
+     return userNomineeData[_msgSender()];
   }
  
  /*
@@ -157,11 +151,10 @@ contract DigitalVault is Ownable, Pausable {
   }
 
   receive() external payable {
-    emit Log(tx.origin, msg.value);
+    emit Log(_msgSender(), msg.value);
   }
 
   fallback() external payable {
-    emit Log(tx.origin, msg.value);
-  }  
-
+    emit Log(_msgSender(), msg.value);
+  }
 }
