@@ -139,7 +139,10 @@ user.UserNominee = function (req, res, next) {
 			console.log(result);
 			if (result) {
 				helper.successHandler(res, {
-					data: result.data
+					data: {
+						count: result.message.count,
+						data: result.message.data
+					}
 				}, 200);
 			} else {
 				helper.errorHandler(res, {
@@ -162,7 +165,10 @@ user.UserNomineeByUsers = function (req, res, next) {
 			console.log(result);
 			if (result) {
 				helper.successHandler(res, {
-					data: result.data
+					data: {
+						count: result.message.count,
+						data: result.message.data
+					}
 				}, 200);
 			} else {
 				helper.errorHandler(res, {

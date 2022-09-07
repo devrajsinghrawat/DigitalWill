@@ -134,7 +134,7 @@ userModel.UserNominee = async function (body) {
 			if(result.length > 0) {
 				
 				deferred.resolve(
-					{ status: true , message : { data : result } }
+					{ status: true , message : { data : result , count : result.length } }
 				);
 					
 			} else {
@@ -162,7 +162,7 @@ userModel.UserNomineeByUsers = async function (body) {
 			if(result.length > 0) {
 				
 				deferred.resolve(
-					{ status: true , message : { data : result } }
+					{ status: true , message : { data : result , count : result.length } }
 				);
 					
 			} else {

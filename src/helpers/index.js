@@ -29,6 +29,9 @@ helper.successHandler = function (res, options, httpStatuCode) {
         message: (options && options.message) || 'Operation performed successfully',
         data: (options && options.data) || []
     }
+
+    console.log('obj======', obj);
+
     res.send(obj);
 }
 
