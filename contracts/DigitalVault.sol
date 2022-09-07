@@ -30,9 +30,9 @@ contract DigitalVault is Ownable, Pausable {
 
   event nomineeAdded(address indexed _n);
   event nomineeRemoved(address indexed _n);
+  event Log(address sender, uint value);
 
-
-  constructor(uint _signatureDuration) Ownable() payable {
+  constructor(uint _signatureDuration) Ownable() {
     _expectedBlocksBetweenTwoSignatures = _signatureDuration;
   }
 
@@ -69,6 +69,38 @@ contract DigitalVault is Ownable, Pausable {
  * Add nominee for the user
  * @return {tuple(address, uint)} get the nominee details for the user
  */
+  function deposit() external {
+
+  }
+
+/*
+ * User or Nominee can withdraw their allocated funds
+ * @return {tuple(address, uint)} get the nominee details for the user
+ */
+  function withdraw() external whenNotPaused {
+
+  }
+
+/*
+ * Emergency Control - Pause
+ * @return {tuple(address, uint)} get the nominee details for the user
+ */
+  function pause() external onlyOwner {
+    _pause();
+  }
+
+/*
+ * Emergency Control - unPause
+ * @return {tuple(address, uint)} get the nominee details for the user
+ */
+  function unpause() external onlyOwner {
+    _unpause();
+  }
+
+/*
+ * Add nominee for the user
+ * @return {tuple(address, uint)} get the nominee details for the user
+ */
   function getNominee() public view returns( NomineeDetails[] memory) {
      return userNomineeData[msg.sender];
   }
@@ -77,8 +109,16 @@ contract DigitalVault is Ownable, Pausable {
  * check balance for the user
  * @return {uint} account balance of the user
  */
-  function checkBalance() external onlyOwner view returns(uint){
+  function checkBalance() external view onlyOwner returns(uint){
     return address(this).balance;
   }
+
+  receive() external payable {
+    emit Log(tx.origin, msg.value);
+  }
+
+  fallback() external payable {
+    emit Log(tx.origin, msg.value);
+  }  
 
 }
