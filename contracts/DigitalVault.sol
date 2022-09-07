@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
 contract DigitalVault is Ownable, Pausable {
   // address public owner;
   mapping (address => uint) public userBalance;
