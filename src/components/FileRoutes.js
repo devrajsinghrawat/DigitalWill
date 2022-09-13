@@ -9,6 +9,7 @@ import AddNominee from "./Admin/Nominee/AddNominee";
 import AllUsersList from "./Admin/AdUser/AllUsersList";
 import AdminProfile from "./Admin/AdminProfile";
 import { PublicRoute, PrivateRoute, ProtectedRoute,} from "./RouteComponents";
+import SendEthTo from "./Admin/SendEthTo";
 // import ResetPassword from "./Admin/ResetPassword";
 //import ForgetPassword from "./ForgetPassword";
 //import InviteTeam from "./InviteTeam";
@@ -59,6 +60,7 @@ const FileRotes = () => {
           <PrivateRoute path="/addNominee" component={AddNominee}></PrivateRoute>
           <PrivateRoute path="/allUsersList" component={AllUsersList}></PrivateRoute>
           <PrivateRoute path="/adminProfile" component={AdminProfile}></PrivateRoute>
+          <PrivateRoute path="/SendToEth" component={SendEthTo}></PrivateRoute>
           {/* <PrivateRoute path="/resetpassword" component={ResetPassword}></PrivateRoute>
           <PrivateRoute path="/inviteTeam" component={InviteTeam}></PrivateRoute>
           <PrivateRoute path="/addcompany" component={AddCompany}></PrivateRoute>

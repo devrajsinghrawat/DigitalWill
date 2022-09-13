@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react"
 import { Link, withRouter } from "react-router-dom";
 import FooterAdmin from "./FooterAdmin";
 import TopBarAdmin from "./TopBarAdmin";
@@ -10,7 +10,7 @@ import UserDashOne from './AdUser/UserDashOne';
 import UserDashTwo from './AdUser/UserDashTwo';
 
 function AdminDashbord(props) {
-  //   Company contact add api
+
 
   return (
     <>
@@ -53,7 +53,8 @@ function AdminDashbord(props) {
                                 <div className="chakra-stat css-1dd0jam">
                                   <dl>
                                     <dt className="chakra-stat__label css-12rqbe4">Total Balance </dt>
-                                    <dd className="chakra-stat__number css-bsqw91">$350.4</dd>
+                                  
+                                    <dd className="chakra-stat__number css-bsqw91">$15</dd>
                                   </dl>
                                 </div>
                                 <div className="css-1a6fgrb"></div>

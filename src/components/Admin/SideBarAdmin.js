@@ -4,7 +4,9 @@ import image from '../Admin/InfoDrive-Logo1.png';
 
 
 export default function SideBarAdmin() {
-    const UserRole = localStorage.getItem("UserRole");
+    const UserKey = localStorage.getItem("id");
+    
+   
     return (
         <>
        
@@ -32,17 +34,51 @@ export default function SideBarAdmin() {
 
             {/*  Nav Item - Pages Collapse Menu */ }
             {(() => {
-                if (UserRole == "0") {
+                if (UserKey == "0xF2379d114d065c54d9C49dB8bB3a4035550c4e71") {
+                return (
+                    <div>
+                        <li className="nav-item">
+                        <Link className="nav-link collapsed" to="/allUsersList" data-toggle="collapse" data-target="#collapseTwo"
+                                aria-expanded="true" aria-controls="collapseTwo">
+                            <i className="fas fa-users"></i>
+                                <span>All User</span>
+                            </Link>
+                        </li>
+                        <li className="nav-item">
+                        <Link className="nav-link collapsed" to="/addNominee" data-toggle="collapse" data-target="#collapseTwo"
+                                aria-expanded="true" aria-controls="collapseTwo">
+                           <i className="fa fa-address-book"></i>
+                                <span>Add Nominee</span>
+                            </Link>
+                        </li>
+                        <li className="nav-item">
+                        <Link className="nav-link collapsed" to="/SendToEth" data-toggle="collapse" data-target="#collapseTwo"
+                                aria-expanded="true" aria-controls="collapseTwo">
+                            <i className="fas fa-users"></i>
+                                <span>Send Eth</span>
+                            </Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link className="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities1"
+                                aria-expanded="true" aria-controls="collapseUtilities1">
+                           
+                            <i class="fas fa-users-cog"></i>
+                                <span>Setting</span>
+                            </Link>
+                            <div id="collapseUtilities1" className="collapse" aria-labelledby="headingUtilities"
+                                data-parent="#accordionSidebar">
+                                <div className="bg-white py-2 collapse-inner rounded">
+                                    <Link className="collapse-item" to="/adminProfile">Profile</Link>
+                                    
+                                </div>
+                            </div>
+                        </li>
+                    </div>
+                )
+                } else {
                 return (
                     <div>
                         {/* <li className="nav-item">
-                            <Link className="nav-link collapsed" to="/inviteTeam" data-toggle="collapse" data-target="#collapseTwo"
-                                aria-expanded="true" aria-controls="collapseTwo">
-                                <i className="fas fa-fw fa-cog"></i>
-                                <span>Team invite</span>
-                            </Link>
-                        </li> 
-                        <li className="nav-item">
                             <Link className="nav-link collapsed" to="/resetpassword" data-toggle="collapse" data-target="#collapse"
                                 aria-expanded="true" aria-controls="collapseUtilities">
                                 <i className="fas fa-fw fa-wrench"></i>
@@ -92,81 +128,41 @@ export default function SideBarAdmin() {
                                 </div>
                             </div>
                         </li> */}
-                        <li className="nav-item">
-                        <Link className="nav-link collapsed" to="/allUsersList" data-toggle="collapse" data-target="#collapseTwo"
+                        {/* <li className="nav-item">
+                        <Link className="nav-link collapsed" to="/candidatesList" data-toggle="collapse" data-target="#collapseTwo"
                                 aria-expanded="true" aria-controls="collapseTwo">
                             <i className="fas fa-users"></i>
-                                <span>All User</span>
+                                <span>Candidates</span>
                             </Link>
-                        </li>
-                        <li className="nav-item">
+                        </li> */}
+                         <li className="nav-item">
                         <Link className="nav-link collapsed" to="/addNominee" data-toggle="collapse" data-target="#collapseTwo"
                                 aria-expanded="true" aria-controls="collapseTwo">
                            <i className="fa fa-address-book"></i>
                                 <span>Add Nominee</span>
                             </Link>
                         </li>
-                    </div>
-                )
-                } else {
-                return (
-                    <div>
                         <li className="nav-item">
-                            <Link className="nav-link collapsed" to="/resetpassword" data-toggle="collapse" data-target="#collapse"
-                                aria-expanded="true" aria-controls="collapseUtilities">
-                                <i className="fas fa-fw fa-wrench"></i>
-                                <span>Reset Password</span>
+                        <Link className="nav-link collapsed" to="/SendToEth" data-toggle="collapse" data-target="#collapseTwo"
+                                aria-expanded="true" aria-controls="collapseTwo">
+                            <i className="fas fa-users"></i>
+                                <span>Send Eth</span>
                             </Link>
-                            
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
-                                aria-expanded="true" aria-controls="collapsePages">
-                                <i className="fas fa-fw fa-folder"></i>
-                                <span>Company</span>
-                            </Link>
-                            <div id="collapsePages" className="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-                                <div className="bg-white py-2 collapse-inner rounded">
-                                    <Link className="collapse-item" to="/addcompany">Add Company</Link>
-                                    <Link className="collapse-item" to="/companylist">Company List</Link>                        
-                                </div>
-                            </div>
-                        </li>           
-                        <li className="nav-item">
-                            <Link className="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
-                                aria-expanded="true" aria-controls="collapseUtilities">
-                            <i className="fa fa-address-book"></i>
-                                <span>Contact</span>
-                            </Link>
-                            <div id="collapseUtilities" className="collapse" aria-labelledby="headingUtilities"
-                                data-parent="#accordionSidebar">
-                                <div className="bg-white py-2 collapse-inner rounded">
-                                <Link className="collapse-item" to="/addcontact">Add Contact</Link>
-                                    <Link className="collapse-item" to="/contactlist">Contact List</Link>
-                                </div>
-                            </div>
                         </li>
                         <li className="nav-item">
                             <Link className="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities1"
                                 aria-expanded="true" aria-controls="collapseUtilities1">
-                            <i className="fas fa-briefcase"></i>
-                                <span>Jobs</span>
+                           
+                            <i class="fas fa-users-cog"></i>
+                                <span>Setting</span>
                             </Link>
                             <div id="collapseUtilities1" className="collapse" aria-labelledby="headingUtilities"
                                 data-parent="#accordionSidebar">
                                 <div className="bg-white py-2 collapse-inner rounded">
-                                    <Link className="collapse-item" to="/AddJobs">Add Jobs</Link>
-                                    <Link className="collapse-item" to="/Jobs">Jobs List</Link>
-                                    <Link className="collapse-item" to="/appliedJobList">Applied Job List</Link>
+                                    <Link className="collapse-item" to="/adminProfile">Profile</Link>
+                                    
                                 </div>
                             </div>
-                        </li>
-                        <li className="nav-item">
-                        <Link className="nav-link collapsed" to="/candidatesList" data-toggle="collapse" data-target="#collapseTwo"
-                                aria-expanded="true" aria-controls="collapseTwo">
-                            <i className="fas fa-users"></i>
-                                <span>Candidates</span>
-                            </Link>
                         </li>
                     </div>
                 )

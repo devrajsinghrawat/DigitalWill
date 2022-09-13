@@ -39,8 +39,8 @@ import Refresh from '@material-ui/icons/Refresh';
     const getAllNotes = (id) =>{
         axios.post(url,{UserId:id})
         .then((response)=>{
-            console.log("JJJ___",response);
-            const allNotes = response.data.data.data;
+            //console.log("JJJ___",response);
+            const allNotes = response.data.data;
             
             getNotes(allNotes);
         })

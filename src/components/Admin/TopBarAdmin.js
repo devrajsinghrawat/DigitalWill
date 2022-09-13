@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 export default function TopBarAdmin() {
 
@@ -10,7 +11,8 @@ export default function TopBarAdmin() {
     function handleLogOut() {
         
        // sessionStorage.clear();
-        window.localStorage.clear();
+       localStorage.removeItem('id')
+        //window.localStorage.clear();
        
       }
  
@@ -178,10 +180,19 @@ export default function TopBarAdmin() {
             <div className="topbar-divider d-none d-sm-block"></div>
 
             {/* <!-- Nav Item - User Information -->  */}
+            <div className="mt-3">
+            <ConnectButton label="Login With MetaMask" chainStatus="icon" accountStatus="avatar"
+                        showBalance={{
+                            smallScreen: false,
+                            largeScreen: true,
+                        }}
+                    />
+                    </div>
             <li className="nav-item dropdown no-arrow">
                 <a className="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span className="mr-2 d-none d-lg-inline text-gray-600 small">Hi {UserName}</span>
+                        
+                    <span className="mr-2 d-none d-lg-inline text-gray-600 small"> {UserName}</span>
                     <img className="img-profile rounded-circle"
                         src="/img/undraw_profile.svg" />
                 </a>

@@ -3,7 +3,7 @@ import { Route,Redirect } from "react-router-dom";
 
 const isLogin=()=>{
     const isLogin= localStorage.getItem("id") || false;
-   
+
     return isLogin;
 }
 

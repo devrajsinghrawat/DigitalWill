@@ -716,6 +716,7 @@ li.nav-item:hover {
     background: rgb(255, 255, 255) none repeat scroll 0% 0%;
 }
 .adbd {
+  border: 1px solid #33333330;
   padding: 15px 20px;
   display: flex;
   flex-direction: column;
@@ -779,6 +780,20 @@ button.btn.dshTwo {
     box-shadow: none;
   font-size: 14px;
   color: green;
+  font-weight: 700;
+}
+.tbl_dsh.table {
+  width: 100%;
+  margin-bottom: 0rem;
+  color: #333;
+  text-align: left;
+}
+a.ladshb {
+  float: right;
+  background: var(--rk-colors-accentColor);
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
   font-weight: 700;
 }
 /* 30-8-2022 */

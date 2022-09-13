@@ -1,171 +1,98 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios"
-import Sidebar from './Sidebar';
 import { Link } from "react-router-dom";
-import {isEmail, isEmpty, isStrongPassword} from "validator";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useHistory  } from "react-router-dom";
-import img_icon from './../infoDrive_background.png';
-export default function Login({setLoginUser}) {
-   
-    const navigate = useHistory ()
-    const [state, setState]= useState({
-        email:"",
-        password:""
-    })
+import { useHistory } from "react-router-dom";
+import img_bck from './../Digital-Vault2.png';
 
-    const [errors, setErrors]= useState({
-        email:""
-    })
-   
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { signIn, useSession } from 'next-auth/react'
+import { useAccount, useSignMessage, useNetwork } from 'wagmi'
 
-    useEffect(()=>{})
+export default function Login(props) {
+    const navigate = useHistory()
+    const [data, setdata] = useState([]);
+    const { isConnected, address } = useAccount()
+    const { chain } = useNetwork()
+    const { status } = useSession()
+    const { signMessageAsync } = useSignMessage()
+    //const { push } = useRouter()
+    const handleAuth = async () => {
+        const userData = { address, chain: chain.id, network: 'evm' }
+         //const UAdd = userData.address;
 
-    const _handleChange=(e)=>{
-        const {name, value}= e.target;
-        const Errors= {...errors}
+        setdata(userData);
        
-        switch (name) {
-            case "email":{
-                if(isEmpty(value)){
-                    Errors[name]= "Required"
-                }else if(!isEmail(value)){
-                    Errors[name]= "Invalid Email"
-                }else{
-                    Errors[name]= ""
-                }
-                break;
-            }    
-            
-        }
-        setErrors({...Errors})
-        setState((pre)=>({
-            ...pre,
-            [name]:value
-        }))
-    }
-    const loginbtn = () => {
-        
-         //toast("Wow so easy!");
-        const {  email, password } = state
-        if( email && password ){
-            axios.post("http://localhost:3001/loginUser", state)
-            .then( res => { 
-                    const {status, message, payload}= res.data;
-                    
-                    if(!status){
-                
-                    toast.error(message, {
-                        autoClose: 4000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                    });
+        await axios.post("http://localhost:3001/addUser", userData)
+            .then(res => {
+                console.log("responce_____", res);
 
-                     return;
-                    }
-                    toast.success('Login!', {
-                        position: "top-right",
-                        autoClose: 4000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                    });
-                    
-                    /*swal({
-                        title: "Success",
-                        text: message,
-                        type: "success"
-                    })*/
-                    localStorage.setItem("id", payload[0].UserId)
-                    localStorage.setItem("EmailId", payload[0].EmailId)
-                    localStorage.setItem("FirstName", payload[0].FirstName)
-                    localStorage.setItem("UserRole", payload[0].UserRoleId)
-               
-                     navigate.push('/dashboard')
-
-            }).catch(err=>{
-                //console.log("okkkk_____",err);
-                toast.error(err.response.data.message, {
-                    autoClose: 4000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
-                
             })
-        } else {
-            toast.error('Invlid Input', {
-                autoClose: 4000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
-          
-        }
-        
+        const message = "Hi Mandeep";
+        const signature = await signMessageAsync({ message })
+        console.log("signature____", signature);
     }
-    const myStyle={
-        backgroundImage:`url(${img_icon})`,
-                height:'108vh',
-                backgroundSize: 'cover',
-                backgroundRepeat: 'no-repeat',
-                };
+    useEffect(() => {
+       
+        if (status === 'unauthenticated' && isConnected) {
+            console.log("tst1__",data);
+            handleAuth()
+            //navigate.push('/dashboard')
 
-    //console.log(state, errors, "oooppp")
+        } else {
+             navigate.push('/signin')
+            //console.log("you are not connected");
+
+        }
+    }, [status, isConnected,address,chain])
+    //console.log("tst1__",data);
+    const myStyle = {
+        backgroundImage: `url(${img_bck})`,
+        height: '108vh',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        WebkitBackgroundSize: 'cover',
+        MozBackgroundSize: 'cover',
+        OBackgroundSize: 'cover',
+        position: 'fixed',
+        width: '100%',
+       // height: '100%'
+    };
+    const ad = localStorage.getItem("id");
+ 
 
     return (
         <>
-        <div className="container-flui" style={myStyle}>
-       
-        <div className="container log_top">
-        <div className="mb-3">
-            <div className="row lng" id="main">
-                <div className="col-5 side">
-                     <Sidebar /> 
-                </div>
-                <div className="col-7">
-                    <div className="login">
-                        { /*console.log("User", user) */}
-                        
-                        <h5>Login to InfoDrive CRM</h5>
-                        <span>Enter your details below</span>
-                        
-                        <input type="text" name="email"  placeholder="Enter Your Email" value={state.email} onChange={_handleChange} />
-                        {
-                            errors.email.length > 0 && errors.email
-                        }
-                        <input type="password" name="password"  placeholder="Enter Your Password" value={state.password} onChange={_handleChange}/>
+            <div className="container-flui" style={myStyle}>
+                <nav className="navbar navbar-dark bg-dark">
+                    <a className="navbar-brand">Digital Will Vault</a>
 
-                        <div className="row lbm">
-                            <div className="col-sm">
-                            <div className="button2" ><Link to="/forget-password">Forgot Password?</Link></div>
-                            </div>
-                            <div className="col-sm">
-                           
-                            </div>
-                            <div className="col-sm">
-                            <div className="button2" ><button type="button" className="btn btn-primary" onClick={loginbtn} >Login</button></div>
-                            
-                            </div>
-                        </div>
-                        
-                    </div>
+                    {(() => {
+                        if ( ad == null) {
+                            return (
+                                <div></div>
+                            )
+                        } else {
+                            return (
+                                <div><Link to="/dashboard" className="navbar-nav ladshb">Go To Admin Dashboard</Link></div>
+
+                            )
+                        }
+                    })()}
+                    <ConnectButton label="Login With MetaMask" chainStatus="icon" accountStatus="avatar"
+                        showBalance={{
+                            smallScreen: false,
+                            largeScreen: true,
+                        }}
+                    />
+                </nav>
+                <div className="container log_top">
+
+
                 </div>
             </div>
-            </div>
-            </div>
-        </div>
-        <ToastContainer />
+            <ToastContainer />
         </>
     )
 }
