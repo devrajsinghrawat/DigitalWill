@@ -12,41 +12,42 @@ import { useAccount, useSignMessage, useNetwork } from 'wagmi'
 
 export default function Login(props) {
     const navigate = useHistory()
-    const [data, setdata] = useState([]);
+    const [data, setdata] = useState();
     const { isConnected, address } = useAccount()
     const { chain } = useNetwork()
     const { status } = useSession()
     const { signMessageAsync } = useSignMessage()
     //const { push } = useRouter()
-    const handleAuth = async () => {
-        const userData = { address, chain: chain.id, network: 'evm' }
-         //const UAdd = userData.address;
 
-        setdata(userData);
-       
-        await axios.post("http://localhost:3001/addUser", userData)
-            .then(res => {
-                console.log("responce_____", res);
-
-            })
-        const message = "Hi Mandeep";
-        const signature = await signMessageAsync({ message })
-        console.log("signature____", signature);
-    }
     useEffect(() => {
-       
+        const handleAuth = async () => {
+            const userData = { address, chain: chain.id, network: 'evm' }
+            const UAdd = userData.address;
+            localStorage.setItem("id",UAdd);
+            const getData = localStorage.getItem("id");
+            console.log("getData__",getData);
+            setdata(getData);
+
+            await axios.post("http://localhost:3001/addUser", userData)
+                .then(res => {
+                    console.log("responce_____", res);
+
+                })
+            const message = "Hi Mandeep";
+            const signature = await signMessageAsync({ message })
+            console.log("signature____", signature);
+        }
         if (status === 'unauthenticated' && isConnected) {
-            console.log("tst1__",data);
+            console.log("tst1__",status ,isConnected);
             handleAuth()
-            //navigate.push('/dashboard')
+            navigate.push('/dashboard')
 
         } else {
-             navigate.push('/signin')
+            navigate.push('/signin')
             //console.log("you are not connected");
 
         }
-    }, [status, isConnected,address,chain])
-    //console.log("tst1__",data);
+    }, [status, isConnected])
     const myStyle = {
         backgroundImage: `url(${img_bck})`,
         height: '108vh',
@@ -57,11 +58,9 @@ export default function Login(props) {
         OBackgroundSize: 'cover',
         position: 'fixed',
         width: '100%',
-       // height: '100%'
+        // height: '100%'
     };
     const ad = localStorage.getItem("id");
- 
-
     return (
         <>
             <div className="container-flui" style={myStyle}>
@@ -69,7 +68,7 @@ export default function Login(props) {
                     <a className="navbar-brand">Digital Will Vault</a>
 
                     {(() => {
-                        if ( ad == null) {
+                        if (ad == null || ad === '') {
                             return (
                                 <div></div>
                             )

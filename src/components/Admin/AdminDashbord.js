@@ -3,15 +3,113 @@ import { Link, withRouter } from "react-router-dom";
 import FooterAdmin from "./FooterAdmin";
 import TopBarAdmin from "./TopBarAdmin";
 import SideBarAdmin from "./SideBarAdmin";
-import axios from "axios";
+//import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import UserDashOne from './AdUser/UserDashOne';
 import UserDashTwo from './AdUser/UserDashTwo';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import { ethers } from "ethers";
+import ABI from "./abi.json";
+import ErrorMessage from "./ErrorMessage";
+import ToggleSwitch from "../Admin/Lodder/ToggleSwitch";
+import { BigNumber, FixedFormat, FixedNumber, formatFixed, parseFixed, BigNumberish } from "@ethersproject/bignumber";
 
-function AdminDashbord(props) {
+// Payment send funcation
+const startPayment = async ({ setError, setTxs, ether, addr }) => {
+  try {
+    if (!window.ethereum)
+      throw new Error("No crypto wallet found. Please install it.");
 
+    await window.ethereum.send("eth_requestAccounts");
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    ethers.utils.getAddress(addr);
+    // Get Interface
+    const iface = new ethers.utils.Interface(ABI);
+    // Get Function data 
+    const data = iface.encodeFunctionData("deposit", []);
+    const tx = await signer.sendTransaction({
+      to: addr,
+      value: ethers.utils.parseEther(ether),
+      data
+    })
+    const receipt = await tx.wait();
+    console.log("TXTX___", tx);
+    console.log("okkk___", receipt);
 
+    setTxs([tx]);
+
+  } catch (err) {
+    setError(err.message);
+  }
+};
+//Get User Blance
+const GetNomineeBalance
+ = async ({ setBalanceError, setnomBalance }) => {
+
+  try {
+    if (!window.ethereum)
+      throw new Error("No crypto wallet found. Please install it.");
+
+    await window.ethereum.send("eth_requestAccounts");
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    
+    const AccountAdd = await signer.getAddress();
+   // console.log("Account2222:", AccountAdd);
+    ethers.utils.getAddress("0x2fe348929abfe45270ab4b0951f220a540f19276");
+    const iface = new ethers.Contract("0x2fe348929abfe45270ab4b0951f220a540f19276", ABI, signer);
+    try {
+      //const userd = await iface.getNominee();
+      const userd = await iface.userBalance(AccountAdd);
+      console.log("man___bl22",userd); 
+      let vr = BigNumber.from(userd._hex);
+        let nocov = vr.toString();
+        const finalBalance = ethers.utils.formatEther( nocov );
+        setnomBalance(finalBalance);
+
+    } catch (error) {
+
+      console.log("ERROR AT GETTING USER: ", error);
+    }
+
+  } catch (err) {
+    setBalanceError(err.message);
+  }
+};
+function AdminDashbord() {
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+  const [error, setError] = useState();
+  const [txs, setTxs] = useState([]);
+  const [BalanceError1, setBalanceError] = useState();
+  //const [txsBalance, setTxsBalance] = useState([]);
+  const [nomBalance, setnomBalance] = useState([]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const data = new FormData(e.target);
+    setError();
+    await startPayment({
+      setError,
+      setTxs,
+      ether: data.get("ether"),
+      addr: data.get("addr")
+    });
+
+  };
+  useEffect(async () => {
+    setBalanceError();
+    await GetNomineeBalance({
+      setBalanceError,
+      setnomBalance
+    });
+    //console.log('mount it!');
+  }, []);
+  console.log("nom__",nomBalance);
   return (
     <>
       { /*<div className="container adm"> */}
@@ -36,7 +134,9 @@ function AdminDashbord(props) {
                       {/*  <!-- Page Heading --> */}
                       <div className="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 className="h3 mb-0 text-gray-800">Dashboard</h1>
-
+                        <React.Fragment>
+                          <ToggleSwitch label="Contract Status" />
+                        </React.Fragment>
                       </div>
                       <div className="col-sm-12 rsp">
                         <div className="row">
@@ -53,15 +153,15 @@ function AdminDashbord(props) {
                                 <div className="chakra-stat css-1dd0jam">
                                   <dl>
                                     <dt className="chakra-stat__label css-12rqbe4">Total Balance </dt>
-                                  
-                                    <dd className="chakra-stat__number css-bsqw91">$15</dd>
+
+                                    <dd className="chakra-stat__number css-bsqw91">${nomBalance}</dd>
                                   </dl>
                                 </div>
                                 <div className="css-1a6fgrb"></div>
                               </div>
                             </div>
                           </div>
-                          <div className="col">
+                          {/* <div className="col">
                             <div className="adbd">
                               <div className="css-hylz56">
                                 <div className="css-1u5jwep">
@@ -76,8 +176,8 @@ function AdminDashbord(props) {
                                 <div className="css-1a6fgrb"></div>
                               </div>
                             </div>
-                          </div>
-                          <div className="col">
+                          </div> */}
+                          {/* <div className="col">
                             <div className="adbd">
                               <div className="css-hylz56">
                                 <div className="css-1u5jwep">
@@ -96,24 +196,44 @@ function AdminDashbord(props) {
                                 <div className="css-1a6fgrb"></div>
                               </div>
                             </div>
+                          </div> */}
+                           <div className="col">
+                            <div className="adbd">
+                              < UserDashOne />
+                            </div>
                           </div>
+                          <div className="col">
+                            <div className="adbd">
+                              < UserDashTwo />
+                            </div>
+                          </div>
+                          
                         </div>
                       </div>
-                      <div className="col-sm-8 rsp mt-4">
+                      <div className="col-sm-12 rsp mt-4">
                         <div className="row">
                           <div className="col">
-                          <div className="adbd">
-                            < UserDashOne/>
+                            <div className="popBTNFund">
+                              <button className="btn dshTwo" onClick={handleShow}>Deposit Funds</button><br></br>
+
                             </div>
-                           </div>
+                          </div>
                           <div className="col">
-                          <div className="adbd">
-                          < UserDashTwo />
+                            <div className="popBTNFund">
+
+                              <button className="btn dshTwo">Withdraw Funds</button>
+                            </div>
                           </div>
+                          <div className="col">
+                            <div className="popBTNFund">
+                              <button className="btn dshTwo">IsAlive</button>
+                            </div>
                           </div>
+
                         </div>
                       </div>
-                     
+
+
                       {/* <!-- Content Row --> */}
                     </div>
                   </div>
@@ -124,6 +244,66 @@ function AdminDashbord(props) {
 
                 {/* <!-- End of Content Wrapper --> */}
               </div>
+              <Modal
+                show={show}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+                size="lg"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+              >
+                <Modal.Header closeButton>
+                  <Modal.Title>Deposit Funds</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <form className="m-4" onSubmit={handleSubmit}>
+                    <div className="credit-card w-full lg:w-1/2 sm:w-auto shadow-lg mx-auto rounded-xl bg-white">
+                      <div className="col-sm-12 rsp">
+
+                        <div className="row">
+                          <div className="col">
+                            <label>Recipient Address</label>
+                            <input
+                              type="text"
+                              name="addr"
+                              className="form-control"
+                            />
+                          </div>
+                        </div>
+                        <div className="row">
+                          <div className="col">
+                            <label>Amount in ETH</label>
+
+                            <input
+                              type="text"
+                              name="ether"
+                              className="form-control"
+                            />
+
+                          </div>
+                        </div>
+                        <footer className="p-4">
+                          <button
+                            type="submit"
+                            className="btn btn-primary submit-button focus:ring focus:outline-none w-full"
+                          >
+                            Pay now
+                          </button>
+                          <ErrorMessage message={error} />
+
+                        </footer>
+                      </div>
+
+                    </div>
+                  </form>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="secondary" onClick={handleClose}>
+                    Close
+                  </Button>
+                </Modal.Footer>
+              </Modal>
 
 
             </div>

@@ -5,7 +5,7 @@ import axios from "axios";
 const UserDashTwo = () => {
    //Get api data
    const UserRole = localStorage.getItem("UserRole");
-   const UserId = localStorage.getItem("UserPublicKey");
+   const UserId = localStorage.getItem("id");
    const [ notes, getNotes] = useState(
      []    
   );
@@ -21,7 +21,7 @@ const UserDashTwo = () => {
   const getAllNotes = () =>{
       axios.post(url,{UserPublicKey:UserId})
       .then((response)=>{
-          console.log("JJJ11122sss___",response);
+         // console.log("JJJ11122sss___",response);
           const allNotes = response.data.data.count;
           const allNotes2 = response.data.data.data;
           
@@ -50,6 +50,7 @@ const UserDashTwo = () => {
       <tr>
         <th>Nominee Email Id</th>
         <th>Percentage</th>
+        <th>Action</th>
         
       </tr>
       {notes2.map((val, key) => {
@@ -57,6 +58,7 @@ const UserDashTwo = () => {
           <tr key={key}>
             <td>{val.NomineeEmailId}</td>
             <td>{val.Percentage}</td>
+            <td><button type="button" className="btn btn-success">Withdraw</button></td>
             
           </tr>
         )

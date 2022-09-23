@@ -699,7 +699,7 @@ li.nav-item:hover {
 }
 /*New css add 30-8-2022*/
 #wrapper #content-wrapper {
-  background-color: #f2f5fd;
+  background-color: #F5F5F5;
   width: 100%;
   overflow-x: hidden;
 }
@@ -795,6 +795,76 @@ a.ladshb {
   padding: 10px;
   border-radius: 5px;
   font-weight: 700;
+}
+.bg-gradient-primary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  left: 0px;
+  top: 0px;
+  background: linear-gradient(179deg, #131C55 0%, rgb(19 28 85 / 91%) 104.8%, rgb(19 28 85 / 1%) 169.64%);
+
+}
+.btn-success {
+  color: #fff !important;
+  background-color: #17a673 !important;
+  border-color: #169b6b;
+}
+.popBTNFund {
+  border: 1px solid #33333330;
+  padding: 32px 0px;
+  width: 100%;
+  position: relative;
+  border-radius: 20px;
+  min-width: 0px;
+  overflow-wrap: break-word;
+  background: rgb(255, 255, 255) none repeat scroll 0% 0%;
+}
+.popBTNFund:hover{
+  box-shadow: 0 10px 16px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%) !important;
+}
+button.btndl {
+  background-color: red;
+  color: #fff;
+  border: 1px solid red;
+  border-radius: 5px;
+}
+
+.lds-ring {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.lds-ring div {
+  box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    margin: 8px;
+    border: 8px solid #333;
+    border-radius: 50%;
+    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: #333 transparent transparent transparent;
+}
+.lds-ring div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+.lds-ring div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.lds-ring div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+@keyframes lds-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 /* 30-8-2022 */
 /* End Add Company Css*/

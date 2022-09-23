@@ -1,12 +1,12 @@
 import "./App.css";
 import FileRotes from "./components/FileRoutes";
 import { Route, Switch, BrowserRouter, HashRouter } from "react-router-dom";
-import { createClient, configureChains, defaultChains, WagmiConfig } from 'wagmi';
+import { createClient, configureChains, chain, WagmiConfig } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
 import { SessionProvider } from 'next-auth/react';
 import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
-const { provider, webSocketProvider, chains } = configureChains(defaultChains, [publicProvider()]);
+const { provider, webSocketProvider, chains } = configureChains([chain.mainnet, chain.polygon, chain.polygonMumbai ], [publicProvider()]);
 
 const { connectors } = getDefaultWallets({
   appName: 'My RainbowKit App',
@@ -28,7 +28,7 @@ function App(Component, pageProps) {
     <div className="App">
       <WagmiConfig client={client}>
         <SessionProvider session={pageProps.session} refetchInterval={0}>
-          <RainbowKitProvider chains={chains}>
+          <RainbowKitProvider chains={chains} coolMode>
             <BrowserRouter>
               <Switch>
                 <Route path="/" component={FileRotes} />

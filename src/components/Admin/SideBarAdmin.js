@@ -51,13 +51,13 @@ export default function SideBarAdmin() {
                                 <span>Add Nominee</span>
                             </Link>
                         </li>
-                        <li className="nav-item">
+                        {/* <li className="nav-item">
                         <Link className="nav-link collapsed" to="/SendToEth" data-toggle="collapse" data-target="#collapseTwo"
                                 aria-expanded="true" aria-controls="collapseTwo">
                             <i className="fas fa-users"></i>
                                 <span>Send Eth</span>
                             </Link>
-                        </li>
+                        </li> */}
                         <li className="nav-item">
                             <Link className="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities1"
                                 aria-expanded="true" aria-controls="collapseUtilities1">
@@ -142,13 +142,13 @@ export default function SideBarAdmin() {
                                 <span>Add Nominee</span>
                             </Link>
                         </li>
-                        <li className="nav-item">
+                        {/* <li className="nav-item">
                         <Link className="nav-link collapsed" to="/SendToEth" data-toggle="collapse" data-target="#collapseTwo"
                                 aria-expanded="true" aria-controls="collapseTwo">
                             <i className="fas fa-users"></i>
                                 <span>Send Eth</span>
                             </Link>
-                        </li>
+                        </li> */}
                         <li className="nav-item">
                             <Link className="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities1"
                                 aria-expanded="true" aria-controls="collapseUtilities1">
