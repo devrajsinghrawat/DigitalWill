@@ -31,6 +31,7 @@ contract DigitalVault is Ownable, Pausable {
 
   event FundDeposited(address indexed depositor, uint amount, uint DepositBlockNumber);
   event FundWithdraw(address indexed withdrawer, uint amount, uint WithdrawalBlockNumber);
+  event NomineeFundWithdraw(address indexed user, address indexed withdrawer, uint amount, uint WithdrawalBlockNumber);
   event NomineeAdded(address indexed nominee);
   event NomineeRemoved(address indexed user, address nominee);
   event Log(address sender, uint value);
@@ -72,29 +73,34 @@ contract DigitalVault is Ownable, Pausable {
   /*
   * remove nominee for the user
   * @param  {address} _nominee address of nominee
+  * @param  {address} _user address of user or can be zero address if function is directly called by user
   */
-  function removeNominee(address _nominee) public { 
+  function removeNominee(address _nominee, address _user) public { 
     // Customer should able to add nominee and their % share
     if (_nominee == address(0))       // non Null Check
       revert NullAddress();
 
-    // Function should Update the OwnerNomineeData mapping 
-    uint index = nomineeUserDetails[_nominee][_msgSender()];
-    NomineeDetails[] storage _nominees = userNomineeData[_msgSender()];
+    // Function should Update the OwnerNomineeData mapping
+    /** This function can be called internally as wel externally and due to that
+     we are making a check for address(0) */
+    address user = (_user == address(0)) ?_msgSender() : _user;
+    uint index = nomineeUserDetails[_nominee][user];
+
+    NomineeDetails[] storage _nominees = userNomineeData[user];
     // delete nominee[index];
     // removeElement(nominee, index);
      require(index < _nominees.length, "index out of bound");
      for( uint i = index; i < (_nominees.length - 1); i++){
         _nominees[i] = _nominees[i + 1];
-        nomineeUserDetails[_nominees[i].nominee][_msgSender()] = i;
+        nomineeUserDetails[_nominees[i].nominee][user] = i;
      }
      _nominees.pop();
 
     // remove Nominee and User link
-    require(nomineeUserDetails[_nominee][_msgSender()] >= 0, "invalid nominee address"); 
-    delete nomineeUserDetails[_nominee][_msgSender()];
+    require(nomineeUserDetails[_nominee][user] >= 0, "invalid nominee address"); 
+    delete nomineeUserDetails[_nominee][user];
  
-    emit NomineeRemoved(_msgSender(), _nominee);
+    emit NomineeRemoved(user, _nominee);
   }
 
   /*
@@ -104,6 +110,8 @@ contract DigitalVault is Ownable, Pausable {
     if(msg.value <= 0)
       revert ZeroAmountError(msg.value);
 
+   // Add user Sign    
+    lastSignedBlockNumber[_msgSender()] = block.number;
   // Update user Balance 
     userBalance[_msgSender()] += msg.value;
     emit FundDeposited(_msgSender(), msg.value, block.number);
@@ -113,96 +121,119 @@ contract DigitalVault is Ownable, Pausable {
   * User or Nominee can withdraw their allocated funds
   */
   function withdraw(uint amount) external whenNotPaused {
-    // add logic
     // Using this function users and nominee should be able to withdraw their funds
     // Function should check if the user has sufficient balance or not
-    if(userBalance[msg.sender] < amount)
-      revert InsufficentBalanceError(userBalance[msg.sender], amount);
+    if(userBalance[_msgSender()] < amount)
+      revert InsufficentBalanceError(userBalance[_msgSender()], amount);
 
-    userBalance[msg.sender] -= amount;
-    (bool sent, bytes memory data) = (msg.sender).call{value: amount}("");
+    userBalance[_msgSender()] -= amount;
+    (bool sent, ) = (_msgSender()).call{value: amount}("");
     require(sent, "Failed to send Ether");
-    // payable (msg.sender).transfer(amount);
-    emit FundWithdraw(msg.sender, amount, block.number);
-
-    // Function should check whether isUserFundReadyForInheritance is True or not
-    // Function should check whether the sender is in nomineeUserDetails mapping or not
-    // Function should Update the OwnerBalance mapping
-    // Function should emit event FundWithdrawal(sender, amount)
-    // Get the user details using nomineeUserDetails[_msgSender()] and then check the %share he owns userNomineeData[user][_msgSender()]
-  }
-
-/*
-  * User Sign to prove is alive
-  * @param  {address} _user address of user who had nominated the msg.sender
-  */
-  function proveIsAlive() external {
-    lastSignedBlockNumber[msg.sender] = block.number;
+    // payable (_msgSender()).transfer(amount);
+    emit FundWithdraw(_msgSender(), amount, block.number);
   }
 
   /*
   * Add nominee for the user
-  * @param  {address} _user address of user who had nominated the msg.sender
+  * @param  {address} _user address of user who had nominated the _msgSender()
   */
   function withdrawAsNominee(address _user) external whenNotPaused {
-    // // add logic
-    // // Using this function users and nominee should be able to withdraw their funds
-    // // Function should check if the user has sufficient balance or not
-    // if(userBalance[msg.sender] < amount)
-    //   revert InsufficentBalanceError(userBalance[msg.sender], amount);
-
-    // userBalance[msg.sender] -= amount;
-    // (bool sent, bytes memory data) = (msg.sender).call{value: amount}("");
-    // require(sent, "Failed to send Ether");
-    // // payable (msg.sender).transfer(amount);
-    // emit FundWithdraw(msg.sender, amount, block.number);
-
     // Function should check whether isUserFundReadyForInheritance is True or not
     bool isReady = isUserFundReadyForInheritance(_user);
     require(isReady, "User Fund not Ready For Inheritance");
 
     // Function should check whether the sender is in nomineeUserDetails mapping or not
-    uint share = nomineeUserDetails[msg.sender][_user];
+    uint share = nomineeUserDetails[_msgSender()][_user];
     require(share > 0, "Nominee share does not exist");
 
     // Function should Update the OwnerBalance and Nominee Share mapping
-    uint nomineeShare = ( userBalance[msg.sender] * share ) / 100;
-    userBalance[msg.sender] -= nomineeShare;           // Update User net Balance 
+    uint nomineeShare = ( userBalance[_msgSender()] * share ) / 100;
+    userBalance[_msgSender()] -= nomineeShare;           // Update User net Balance 
 
     /** Ether Remove the Nominee or Mark their share as 0 for audit purpose */
-    nomineeUserDetails[msg.sender][_user] = 0;          // Update Nominee Share details
-    NomineeDetails[] storage _nominees = userNomineeData[_user];
+    delete nomineeUserDetails[_msgSender()][_user];          // Update Nominee Share details
+    
+    // Remove Nominee data 
+    removeNominee(_msgSender(), _user);
+    (bool sent, ) = _msgSender().call{value: nomineeShare}("");
+    require(sent, "Failed to send Ether");
 
-    // Function should emit event FundWithdrawal(sender, amount)
-    // Get the user details using nomineeUserDetails[_msgSender()] and then check the %share he owns userNomineeData[user][_msgSender()]
-
+    emit NomineeFundWithdraw(_user, _msgSender(), nomineeShare, block.number);
   }
 
   /// @dev withdrawEther allows the contract owner (deployer) to withdraw the ETH/Matic from the contract
-  function withdrawEther() external onlyOwner {
+  function withdrawEther() external whenPaused onlyOwner {
       payable(owner()).transfer(address(this).balance);
   }
 
   /*
-  * Validate the user liveness
-  * @param  {address} _nominee address of user
-  * @return {bool} true / false based on the user's sig
+    * User Sign to prove is alive
+    * @param  {address} _user address of user who had nominated the _msgSender()
   */
-  function isAlive(address user) public returns(bool) {
-    // add logic
-    // Current Block - LastSignedBlock > expectedBlocksBetweenTwoSignatures   Return False 
-    // Else  Current Block - LastSignedBlock < expectedBlocksBetweenTwoSignatures   Return True 
+  function proveIsAlive() external {
+    lastSignedBlockNumber[_msgSender()] = block.number;
+  }
+
+  /*
+    * Validate the user liveness
+    * @param  {address} _nominee address of user
+    * @return {bool} true / false based on the user's sig duration
+  */
+  function isAlive(address _user) public view returns(bool) {
+    return (getCurrentBlock() - lastSignedBlockNumber[_user]) > 
+      _expectedBlocksBetweenTwoSignatures ?  false : true;
   } 
 
   /*
-  * Validate if user funds are ready for Inheritance
-  * @param  {address} _nominee address of user
-  * @return {bool} true / false based on the user's sig
+    * Validate if user funds are ready for Inheritance
+    * @param  {address} _nominee address of user
+    * @return {bool} true / false based on the user's sig
   */
-  function isUserFundReadyForInheritance(address user) public returns (bool) {
-    // add logic
-    // Current Block - LastSignedBlock < 2 x expectedBlocksBetweenTwoSignatures   Return False Else  
-    // Current Block - LastSignedBlock > 2 x expectedBlocksBetweenTwoSignatures   Return True
+  function isUserFundReadyForInheritance(address _user) public view 
+    returns (bool) {
+      return (getCurrentBlock() - lastSignedBlockNumber[_user]) < 
+        (2 *_expectedBlocksBetweenTwoSignatures) ?  false : true;
+  }
+
+/*
+ * Add all the user who had nominated this address as nominee
+ * @return {tuple(address, uint)} get the nominee details for the user
+ */
+  function getNominatedBy() public view returns( NomineeDetails[] memory) {
+     
+  }
+ 
+ /*
+ * check balance for the user
+ * @return {uint} account balance of the user
+ */
+  function checkBalance() external view onlyOwner returns(uint){
+    return address(this).balance;
+  }
+
+  /*
+ * get current block number
+ * @return {uint} return the current block number
+ */
+  function getCurrentBlock() public view returns(uint) {
+     return block.number;
+  }
+
+  /*
+  * get next sign block number
+  * @return {uint} return next sign block number
+  */
+  function getNextSignBlock() public view returns(uint) {
+     // Last signed Block number + Sign duration between blocks
+     return lastSignedBlockNumber[_msgSender()] + _expectedBlocksBetweenTwoSignatures;
+  }
+
+  /*
+  * get nominee for the user
+  * @return {tuple(address, uint)} get the nominee details for the user
+  */
+  function getNominee() public view returns( NomineeDetails[] memory) {
+     return userNomineeData[_msgSender()];
   }
 
   /*
@@ -212,28 +243,12 @@ contract DigitalVault is Ownable, Pausable {
     _pause();
   }
 
-/*
- * Emergency Control - unPause
- * @return {tuple(address, uint)} get the nominee details for the user
- */
+  /*
+  * Emergency Control - unPause
+  * @return {tuple(address, uint)} get the nominee details for the user
+  */
   function unpause() external onlyOwner {
     _unpause();
-  }
-
-/*
- * Add nominee for the user
- * @return {tuple(address, uint)} get the nominee details for the user
- */
-  function getNominee() public view returns( NomineeDetails[] memory) {
-     return userNomineeData[_msgSender()];
-  }
- 
- /*
- * check balance for the user
- * @return {uint} account balance of the user
- */
-  function checkBalance() external view onlyOwner returns(uint){
-    return address(this).balance;
   }
 
   receive() external payable {
