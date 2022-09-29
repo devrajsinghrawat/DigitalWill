@@ -22,9 +22,9 @@ const AddNomineeData = async ({ setError, setTxs, SetReceiptInfo, NomineePublicK
         ethers.utils.getAddress(NomineePublicKey);
         // Get Interface
         const iface = new ethers.utils.Interface(ABI);
-        const data = iface.encodeFunctionData("addNominee", [NomineePublicKey, Percentage]);
+        const data = iface.encodeFunctionData("addNominee(address,uint256)", [NomineePublicKey, Percentage]);
         const tx = await signer.sendTransaction({
-            to: "0x2fE348929abFe45270ab4b0951f220a540F19276",
+            to: "0xd104fD11eAA70f0092bf449e0963FC21C070ED82",
             data
         });
        // console.log("tx________",tx,isLoading);

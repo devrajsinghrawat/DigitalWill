@@ -3,7 +3,6 @@ import { Link, withRouter } from "react-router-dom";
 import FooterAdmin from "./FooterAdmin";
 import TopBarAdmin from "./TopBarAdmin";
 import SideBarAdmin from "./SideBarAdmin";
-//import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import UserDashOne from './AdUser/UserDashOne';
@@ -15,7 +14,10 @@ import ABI from "./abi.json";
 import ErrorMessage from "./ErrorMessage";
 import ToggleSwitch from "../Admin/Lodder/ToggleSwitch";
 import { BigNumber, FixedFormat, FixedNumber, formatFixed, parseFixed, BigNumberish } from "@ethersproject/bignumber";
-
+import GetOwnerAddress from "./GetOwnerAddress";
+import GetPausedStatus from "./Lodder/GetPausedStatus";
+import { themeDefault, namesOfModes } from './global'
+import GetIsAliveStatus from "./IsAlive/GetIsAliveStatus";
 // Payment send funcation
 const startPayment = async ({ setError, setTxs, ether, addr }) => {
   try {
@@ -36,8 +38,8 @@ const startPayment = async ({ setError, setTxs, ether, addr }) => {
       data
     })
     const receipt = await tx.wait();
-    console.log("TXTX___", tx);
-    console.log("okkk___", receipt);
+    // console.log("TXTX___", tx);
+    //console.log("okkk___", receipt);
 
     setTxs([tx]);
 
@@ -47,8 +49,43 @@ const startPayment = async ({ setError, setTxs, ether, addr }) => {
 };
 //Get User Blance
 const GetNomineeBalance
- = async ({ setBalanceError, setnomBalance }) => {
+  = async ({ setBalanceError, setnomBalance }) => {
 
+    try {
+      if (!window.ethereum)
+        throw new Error("No crypto wallet found. Please install it.");
+
+      await window.ethereum.send("eth_requestAccounts");
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      //console.log("provider____", window.ethereum.networkVersion, 'window.ethereum.networkVersion');
+      const signer = provider.getSigner();
+
+      const AccountAdd = await signer.getAddress();
+      // console.log("Account2222:", AccountAdd);
+      ethers.utils.getAddress("0xd104fD11eAA70f0092bf449e0963FC21C070ED82");
+      const iface = new ethers.Contract("0xd104fD11eAA70f0092bf449e0963FC21C070ED82", ABI, signer);
+      try {
+        //const userd = await iface.getNominee();
+        const userd = await iface.userBalance(AccountAdd);
+        //console.log("man___bl22", userd);
+        let vr = BigNumber.from(userd._hex);
+        let nocov = vr.toString();
+        const finalBalance = ethers.utils.formatEther(nocov);
+        setnomBalance(finalBalance);
+
+      } catch (error) {
+
+        console.log("ERROR AT GETTING USER: ", error);
+      }
+
+    } catch (err) {
+      setBalanceError(err.message);
+    }
+  };
+
+// Withdrow funds
+const WithDrawFund = async ({ setError, setTxs, ether }) => {
   try {
     if (!window.ethereum)
       throw new Error("No crypto wallet found. Please install it.");
@@ -56,38 +93,82 @@ const GetNomineeBalance
     await window.ethereum.send("eth_requestAccounts");
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
-    
-    const AccountAdd = await signer.getAddress();
-   // console.log("Account2222:", AccountAdd);
-    ethers.utils.getAddress("0x2fe348929abfe45270ab4b0951f220a540f19276");
-    const iface = new ethers.Contract("0x2fe348929abfe45270ab4b0951f220a540f19276", ABI, signer);
-    try {
-      //const userd = await iface.getNominee();
-      const userd = await iface.userBalance(AccountAdd);
-      console.log("man___bl22",userd); 
-      let vr = BigNumber.from(userd._hex);
-        let nocov = vr.toString();
-        const finalBalance = ethers.utils.formatEther( nocov );
-        setnomBalance(finalBalance);
+    ethers.utils.getAddress("0xd104fD11eAA70f0092bf449e0963FC21C070ED82");
+    // Get Interface
+    const iface = new ethers.utils.Interface(ABI);
 
-    } catch (error) {
+    // Get Function data 
+    const Contadd = "0xd104fD11eAA70f0092bf449e0963FC21C070ED82";
 
-      console.log("ERROR AT GETTING USER: ", error);
-    }
+    const data = iface.encodeFunctionData("withdraw(uint256)", [ethers.utils.parseEther(ether)]);
+
+    const tx = await signer.sendTransaction({
+      to: Contadd,
+      data
+    })
+    const receipt = await tx.wait();
+    //console.log("TXTX___2", tx);
+    //console.log("okkk___2", receipt);
+
+    setTxs([tx]);
 
   } catch (err) {
-    setBalanceError(err.message);
+    setError(err.message);
   }
 };
-function AdminDashbord() {
+//ProveIsAlive funcation call using EtherJs
+const GetProveIsAlive
+  = async ({ setError, setProveAlive }) => {
+
+    try {
+      if (!window.ethereum)
+        throw new Error("No crypto wallet found. Please install it.");
+
+      await window.ethereum.send("eth_requestAccounts");
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+
+      const AccountAdd = await signer.getAddress();
+      ethers.utils.getAddress("0xd104fD11eAA70f0092bf449e0963FC21C070ED82");
+      const iface = new ethers.Contract("0xd104fD11eAA70f0092bf449e0963FC21C070ED82", ABI, signer);
+      try {
+        //const nextSign = await iface.getNextSignBlock();
+        const IsAliveSign = await iface.proveIsAlive();
+
+        //console.log("IsAliveSign____111", IsAliveSign);
+        // let vr = BigNumber.from(nextSign._hex);
+        //let nocov = vr.toString();
+        setProveAlive(IsAliveSign);
+
+      } catch (error) {
+
+        console.log("ERROR AT GETTING USER: ", error);
+      }
+
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+function AdminDashbord(props) {
+  const [ProveAlive, setProveAlive] = useState();
+  const rememberMe = localStorage.getItem('Admin');
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const [showWithdr, setWithdr] = useState(false);
+  const handleCloseWithdr = () => setWithdr(false);
+  const handleShowWithdr = () => setWithdr(true);
+
+  const [showIsAive, setIsAive] = useState(false);
+  const handleCloseIsAive = () => setIsAive(false);
+  const handleShowIsAive = () => setIsAive(true);
+
   const [error, setError] = useState();
   const [txs, setTxs] = useState([]);
   const [BalanceError1, setBalanceError] = useState();
-  //const [txsBalance, setTxsBalance] = useState([]);
   const [nomBalance, setnomBalance] = useState([]);
+  const [isOff, setIsOff] = useState(true);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -101,6 +182,16 @@ function AdminDashbord() {
     });
 
   };
+  const handleSubmitWithdrw = async (e) => {
+    e.preventDefault();
+    const data = new FormData(e.target);
+    setError();
+    await WithDrawFund({
+      setError,
+      setTxs,
+      ether: data.get("ether")
+    });
+  }
   useEffect(async () => {
     setBalanceError();
     await GetNomineeBalance({
@@ -109,9 +200,20 @@ function AdminDashbord() {
     });
     //console.log('mount it!');
   }, []);
-  console.log("nom__",nomBalance);
+  const SubmitIsAlive = async () => {
+   // console.log("ENTR____");
+    setError();
+    await GetProveIsAlive({
+      setError,
+      setProveAlive,
+    });
+
+  };
+
   return (
+
     <>
+
       { /*<div className="container adm"> */}
       <div className="adm">
         <div className="mb-3">
@@ -134,10 +236,27 @@ function AdminDashbord() {
                       {/*  <!-- Page Heading --> */}
                       <div className="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 className="h3 mb-0 text-gray-800">Dashboard</h1>
-                        <React.Fragment>
-                          <ToggleSwitch label="Contract Status" />
-                        </React.Fragment>
+
+                        {(() => {
+                          if (rememberMe == "0xcAA36068E764E01CDeEf74fc23eE4204bd082c2b") {
+                            return (
+                              // <div><React.Fragment>
+                              //   <ToggleSwitch label="Contract Status" />
+                              // </React.Fragment></div>
+                              <div className="container tg_cls">
+                                <h4><span>Contract Status</span> <button onClick={() => setIsOff(!isOff)}>{isOff ? 'Paused' : 'UnPaused'}</button></h4>
+                              </div>
+                            )
+                          } else {
+                            return (
+                              <GetPausedStatus />
+
+                            )
+                          }
+                        })()}
+
                       </div>
+
                       <div className="col-sm-12 rsp">
                         <div className="row">
                           <div className="col">
@@ -152,52 +271,52 @@ function AdminDashbord() {
                                 </div>
                                 <div className="chakra-stat css-1dd0jam">
                                   <dl>
-                                    <dt className="chakra-stat__label css-12rqbe4">Total Balance </dt>
+                                    <dt className="chakra-stat__label css-12rqbe4">Total Balance {props.datad} </dt>
+                                    {(() => {
+                                      if (window.ethereum.networkVersion == 1) {
+                                        return (
+                                          <dd className="chakra-stat__number css-bsqw91"><span>ETH</span> {nomBalance}</dd>
 
-                                    <dd className="chakra-stat__number css-bsqw91">${nomBalance}</dd>
+                                        )
+                                      } else if (window.ethereum.networkVersion == 3) {
+                                        return (
+                                          <dd className="chakra-stat__number css-bsqw91"><span>ETH</span> {nomBalance}</dd>
+
+                                        )
+                                      } else if (window.ethereum.networkVersion == 56) {
+                                        return (
+                                          <dd className="chakra-stat__number css-bsqw91"><span>BNB</span> {nomBalance}</dd>
+
+                                        )
+                                      } else if (window.ethereum.networkVersion == 97) {
+                                        return (
+                                          <dd className="chakra-stat__number css-bsqw91"><span>tBNB</span> {nomBalance}</dd>
+
+                                        )
+                                      } else if (window.ethereum.networkVersion == 80001) {
+                                        return (
+                                          <dd className="chakra-stat__number css-bsqw91"><span>MATIC</span> {nomBalance}</dd>
+
+                                        )
+                                      } else if (window.ethereum.networkVersion == 137) {
+                                        return (
+                                          <dd className="chakra-stat__number css-bsqw91"><span>MATIC</span> {nomBalance}</dd>
+
+                                        )
+                                      } else {
+
+                                      }
+                                    })()}
+                                    {/* <dd className="chakra-stat__number css-bsqw91">${nomBalance}</dd>
+                                    {props.datad} */}
                                   </dl>
                                 </div>
                                 <div className="css-1a6fgrb"></div>
                               </div>
                             </div>
                           </div>
-                          {/* <div className="col">
-                            <div className="adbd">
-                              <div className="css-hylz56">
-                                <div className="css-1u5jwep">
-                                  <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 24 24" focusable="false" className="chakra-icon css-7zspnv" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"></path><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"></path></svg>
-                                </div>
-                                <div className="chakra-stat css-1dd0jam">
-                                  <dl>
-                                    <dt className="chakra-stat__label css-12rqbe4">Recived Total</dt>
-                                    <dd className="chakra-stat__number css-bsqw91">$3450.4</dd>
-                                  </dl>
-                                </div>
-                                <div className="css-1a6fgrb"></div>
-                              </div>
-                            </div>
-                          </div> */}
-                          {/* <div className="col">
-                            <div className="adbd">
-                              <div className="css-hylz56">
-                                <div className="css-1u5jwep">
-                                  <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 24 24" focusable="false"
-                                    className="chakra-icon css-7zspnv" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill="none" d="M0 0h24v24H0z"></path>
-                                    <path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"></path>
-                                  </svg>
-                                </div>
-                                <div className="chakra-stat css-1dd0jam">
-                                  <dl>
-                                    <dt className="chakra-stat__label css-12rqbe4">Total Blance Send</dt>
-                                    <dd className="chakra-stat__number css-bsqw91">$450.4</dd>
-                                  </dl>
-                                </div>
-                                <div className="css-1a6fgrb"></div>
-                              </div>
-                            </div>
-                          </div> */}
-                           <div className="col">
+
+                          <div className="col">
                             <div className="adbd">
                               < UserDashOne />
                             </div>
@@ -207,7 +326,7 @@ function AdminDashbord() {
                               < UserDashTwo />
                             </div>
                           </div>
-                          
+
                         </div>
                       </div>
                       <div className="col-sm-12 rsp mt-4">
@@ -221,12 +340,12 @@ function AdminDashbord() {
                           <div className="col">
                             <div className="popBTNFund">
 
-                              <button className="btn dshTwo">Withdraw Funds</button>
+                              <button className="btn dshTwo" onClick={handleShowWithdr}>Withdraw Funds</button>
                             </div>
                           </div>
                           <div className="col">
                             <div className="popBTNFund">
-                              <button className="btn dshTwo">IsAlive</button>
+                              <button className="btn dshTwo" onClick={handleShowIsAive}>IsAlive</button>
                             </div>
                           </div>
 
@@ -298,11 +417,82 @@ function AdminDashbord() {
                     </div>
                   </form>
                 </Modal.Body>
-                <Modal.Footer>
-                  <Button variant="secondary" onClick={handleClose}>
-                    Close
-                  </Button>
-                </Modal.Footer>
+              </Modal>
+
+              {/* WithDrow Funcation model */}
+              <Modal
+                show={showWithdr}
+                onHide={handleCloseWithdr}
+                backdrop="static"
+                keyboard={false}
+                size="lg"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+              >
+                <Modal.Header closeButton>
+                  <Modal.Title>Withdraw Funds</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <form className="m-4" onSubmit={handleSubmitWithdrw}>
+                    <div className="credit-card w-full lg:w-1/2 sm:w-auto shadow-lg mx-auto rounded-xl bg-white">
+                      <div className="col-sm-12 rsp">
+
+                        <div className="row">
+                          <div className="col">
+                            <label>Amount in ETH</label>
+
+                            <input
+                              type="text"
+                              name="ether"
+                              className="form-control"
+                            />
+
+                          </div>
+                        </div>
+                        <footer className="p-4">
+                          <button
+                            type="submit"
+                            className="btn btn-primary submit-button focus:ring focus:outline-none w-full"
+                          >
+                            Withdraw now
+                          </button>
+                          <ErrorMessage message={error} />
+
+                        </footer>
+                      </div>
+
+                    </div>
+                  </form>
+                </Modal.Body>
+              </Modal>
+
+              {/* WithDrow Funcation model */}
+              <Modal
+                show={showIsAive}
+                onHide={handleCloseIsAive}
+                backdrop="static"
+                keyboard={false}
+                size="lg"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+              >
+                <Modal.Header closeButton>
+                  <Modal.Title style={{ color: "#333" }}>Please Sign and Prove Your Liveness</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <GetIsAliveStatus />
+                  <footer className="mb-2 text-center">
+                    <button
+                      onClick={SubmitIsAlive}
+                      className="btn btn-primary submit-button focus:ring focus:outline-none w-full"
+                    >
+                      Prove Liveness
+                    </button>
+                    <ErrorMessage message={error} />
+
+                  </footer>
+                </Modal.Body>
+
               </Modal>
 
 
