@@ -18,14 +18,12 @@ export default function Login(props) {
     const { status } = useSession()
     const { signMessageAsync } = useSignMessage()
     //const { push } = useRouter()
-
     useEffect(() => {
         const handleAuth = async () => {
             const userData = { address, chain: chain.id, network: 'evm' }
             const UAdd = userData.address;
             localStorage.setItem("id",UAdd);
             const getData = localStorage.getItem("id");
-            console.log("getData__",getData);
             setdata(getData);
 
             await axios.post("http://localhost:3001/addUser", userData)
@@ -43,11 +41,14 @@ export default function Login(props) {
             navigate.push('/dashboard')
 
         } else {
-            navigate.push('/signin')
-            //console.log("you are not connected");
-
+            //navigate.push('/signin')
+            console.log("you are not connected");
+  
         }
+
+        
     }, [status, isConnected])
+    
     const myStyle = {
         backgroundImage: `url(${img_bck})`,
         height: '108vh',

@@ -866,5 +866,22 @@ button.btndl {
     transform: rotate(360deg);
   }
 }
+button.BtnUnpus {
+  background-color: green;
+  color: #fff;
+  border-radius: 5px;
+  box-shadow: rgb(0 0 0 / 16%) 0px 10px 36px 0px, rgb(0 0 0 / 6%) 0px 0px 0px 1px;
+  padding: 5px;
+}
+button.BtnPus {
+  background-color: red;
+  color: #fff;
+  border-radius: 5px;
+  box-shadow: rgb(0 0 0 / 16%) 0px 10px 36px 0px, rgb(0 0 0 / 6%) 0px 0px 0px 1px;
+  padding: 5px;
+}
+.chakra-stat__number span {
+  font-size: 13px;
+}
 /* 30-8-2022 */
 /* End Add Company Css*/
