@@ -21,7 +21,6 @@ const UserDashTwo = () => {
   const getAllNotes = () =>{
       axios.post(url,{UserPublicKey:UserId})
       .then((response)=>{
-         // console.log("JJJ11122sss___",response);
           const allNotes = response.data.data.count;
           const allNotes2 = response.data.data.data;
           

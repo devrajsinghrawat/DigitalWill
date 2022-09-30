@@ -20,7 +20,6 @@ function AllUsersList(props) {
         // { title: "Resume", field: 'Resume', render: rowData => <a href={rowData.Resume} target="_blank"><FileOpenIcon src={rowData.Resume} /></a> }, 
 
     ]
-    //console.log("data______000",rowData);
     const tableRef = React.createRef();
     //Get compnay name
     const [notes, getNotes] = useState(
@@ -37,7 +36,7 @@ function AllUsersList(props) {
     const getAllNotes = (id) => {
         axios.post(url, { UserId: id })
             .then((response) => {
-                //console.log("JJJ___",response);
+               
                 const allNotes = response.data.data;
 
                 getNotes(allNotes);
@@ -79,64 +78,7 @@ function AllUsersList(props) {
         }
 
     }
-    // // Delete Candidate list
-    // const urldlt = 'http://localhost:3001/deleteCandidateById/';
-    // const handleRowDelete = (selectedRow, resolve) => {
-    //     const upId = selectedRow.candidateId;
-    //     axios.post(urldlt, { id: upId })
-    //         .then((response) => {
-
-    //             toast.success("Record Deleted successfully!", {
-    //                 position: "top-right",
-    //                 autoClose: 2000,
-    //                 hideProgressBar: false,
-    //                 closeOnClick: true,
-    //                 pauseOnHover: true,
-    //                 draggable: true,
-    //                 progress: undefined,
-    //             });
-    //             setTimeout(() => {
-    //                 getAllNotes(myId);
-    //                 //props.history.push("/candidatesList");
-
-    //             }, 2000);
-
-    //         })
-    //         .catch(error => console.log(`Error: ${error}`));
-
-    // }
-    //Delete Multipal row
-    // const handleBulkDelete = () => {
-
-    //     const urldt = 'http://localhost:3001/deleteAllCandidatesById/';
-    //     const updatedData = notes.filter(row => selectedRows.includes(row))
-
-    //     const updt = updatedData.map((u) => u.candidateId);
-    //     axios.post(urldt, { ids: updt })
-    //         .then((response) => {
-
-    //             toast.success("Record Deleted successfully!", {
-    //                 position: "top-right",
-    //                 autoClose: 2000,
-    //                 hideProgressBar: false,
-    //                 closeOnClick: true,
-    //                 pauseOnHover: true,
-    //                 draggable: true,
-    //                 progress: undefined,
-    //             });
-    //             setTimeout(() => {
-    //                 getAllNotes(myId);
-    //                 //props.history.push("/candidatesList");
-
-    //             }, 2000);
-
-    //         })
-    //         .catch(error => console.log(`Error: ${error}`));
-    //     getdltNotes(updatedData);
-    //     // getdltNotes(JSON.stringify(updatedData));
-
-    // }
-
+   
 
     return (
         <>

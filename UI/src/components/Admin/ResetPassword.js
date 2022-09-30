@@ -105,7 +105,6 @@ const CngPassword = () => {
                                         </div>
                                          {/* <!-- Content Row --> */}
                                             <div className="col-sm-6 rsp offset-3">
-                                            {/* { console.log("User", user) } */}
                                                 <label>Current Password</label>
                                                 <div className="form-group pass_show"> 
                                                 <input type="hidden" className="form-control" placeholder="Current Password" name="email" value={rpgtm} onChange={ handleChange } ></input> 

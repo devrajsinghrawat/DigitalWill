@@ -22,8 +22,6 @@ const startPayment = async ({ setError, setTxs, ether, addr }) => {
             value: ethers.utils.parseEther(ether),
             data
         });
-        console.log({ ether, addr });
-        console.log("tx", tx);
         setTxs([tx]);
 
     } catch (err) {

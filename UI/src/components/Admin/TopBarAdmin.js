@@ -18,13 +18,13 @@ export default function TopBarAdmin() {
     }
     useEffect(() => {
         if ( isConnected == true) {
-            console.log("tst1__",isConnected);
+            //console.log("tst1__",isConnected);
             //handleAuth()
            // navigate.push('/dashboard')
     
         } else {
             //navigate.push('/signin')
-            console.log("you are not connected");
+           // console.log("you are not connected");
     
         }
       });

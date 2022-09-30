@@ -43,8 +43,8 @@ const FileRotes = () => {
           <PrivateRoute path="/getAdmAddress" component={GetOwnerAddress}></PrivateRoute>
           <PrivateRoute path="/getConStatus" component={GetPausedStatus}></PrivateRoute>
           <PrivateRoute path="/getCruntBlock" component={GetIsAliveStatus}></PrivateRoute>
-          <ProtectedRoute exact path="/signup" component={Signup} />
-          <ProtectedRoute exact path="/" component={Signup} />
+          <ProtectedRoute exact path="/signup" component={Login} />
+          <ProtectedRoute exact path="/" component={Login} />
          <Route path="*" component={Page404} /> 
          </Switch>
         </div>

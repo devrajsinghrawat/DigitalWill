@@ -17,7 +17,6 @@ export default function UpdatePassword() {
 })
 
 const handleChange = e => {
-    console.log("form_data",e);
     const { name, value } = e.target
     setUser({
         ...user,
@@ -40,7 +39,7 @@ const updtPassword = () => {
             });
             
         }).catch(err => {
-            console.log('There was an error!', err.response.data.message);
+            //console.log('There was an error!', err.response.data.message);
            // this.setState({ errorMessage: error.message });
            swal({
             title: "Error",
@@ -48,7 +47,7 @@ const updtPassword = () => {
             icon: "error",
             button: "Ok",
           });
-            console.log('There was an error!', err);
+           // console.log('There was an error!', err);
         });
     } else {
         swal({
@@ -78,7 +77,6 @@ const updtPassword = () => {
                         </div>
                             {/* <!-- Content Row --> */}
                             <div className="col-sm-10 rsp offset-3"> 
-                            { console.log("User", user) }
                                 <input type="hidden" className="form-control" placeholder="Current Password" name="email" value={eml} onChange={ handleChange } ></input> 
                                 <label>New Password</label>
                                 <div className="form-group pass_show"> 

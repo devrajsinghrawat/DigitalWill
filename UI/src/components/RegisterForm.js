@@ -36,7 +36,6 @@ export default function RegisterForm() {
 
     return (
         <div className="register">
-            {console.log("User", user)}
             <h1>Register</h1>
             <input type="text" name="name" placeholder="Your Name" onChange={ handleChange }></input>
             <input type="email" name="email" value={user.email} placeholder="Your Email" onChange={ handleChange }></input>

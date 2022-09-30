@@ -11,7 +11,7 @@ import { ethers } from "ethers";
 import ABI from "../abi.json";
 import ErrorMessage from "../ErrorMessage";
 import LoadingSpinner from "../Lodder/LoadingSpinner";
-const AddNomineeData = async ({ setError, setTxs, SetReceiptInfo, NomineePublicKey, Percentage,isLoading }) => {
+const AddNomineeData = async ({ setError, setTxs, SetReceiptInfo, NomineePublicKey, Percentage, isLoading }) => {
     try {
         if (!window.ethereum)
             throw new Error("No crypto wallet found. Please install it.");
@@ -24,18 +24,16 @@ const AddNomineeData = async ({ setError, setTxs, SetReceiptInfo, NomineePublicK
         const iface = new ethers.utils.Interface(ABI);
         const data = iface.encodeFunctionData("addNominee(address,uint256)", [NomineePublicKey, Percentage]);
         const tx = await signer.sendTransaction({
-            to: "0xd104fD11eAA70f0092bf449e0963FC21C070ED82",
+            to: process.env.REACT_APP_CONTRACT_ADD,
             data
         });
-       // console.log("tx________",tx,isLoading);
-        const receipt = await tx.wait();
-       // console.log("receipt_____",receipt,isLoading);
-        
         setTxs(tx);
+        const receipt = await tx.wait();
         SetReceiptInfo(receipt);
 
 
     } catch (err) {
+        console.log("Nominee___error", err.code);
         setError(err.message);
     }
 };
@@ -56,7 +54,6 @@ function AddNominee(props) {
     const [formErrors, setFormErrors] = useState({});
     const [isSubmit, setIsSubmit] = useState(false);
     const handleChange = e => {
-        // console.log("form_data",e);
         const { name, value } = e.target
         setUser({
             ...user,
@@ -67,7 +64,7 @@ function AddNominee(props) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-       
+
         const data = new FormData(e.target);
         setError();
         await AddNomineeData({
@@ -81,49 +78,47 @@ function AddNominee(props) {
         setIsLoading(true);
         setFormErrors(validate(user));
         setIsSubmit(true);
-        
+
     }
     useEffect(() => {
-   if(ReceiptInfo && ReceiptInfo.status == 1){
-    const { UserPublicKey, NomineePublicKey, NomineeEmailId, NomineeMobileNumber, Percentage } = user
-        if (UserPublicKey && NomineePublicKey && Percentage) {
-            // axios.post("http://localhost:3001/AddNominee", user)
-            //     .then(res => {
-            //         setIsLoading(false);
-            //         toast.success("Nominee Added successfully!");
-            //         setTimeout(() => {
-            //             props.history.push("/addNominee");
-            //         }, 3000);
+        if (ReceiptInfo && ReceiptInfo.status == 1) {
+            const { UserPublicKey, NomineePublicKey, NomineeEmailId, NomineeMobileNumber, Percentage } = user
+            if (UserPublicKey && NomineePublicKey && Percentage) {
+                axios.post("http://localhost:3001/AddNominee", user)
+                    .then(res => {
+                        setIsLoading(false);
+                        toast.success("Nominee Added successfully!");
+                        setTimeout(() => {
+                            props.history.push("/dashboard");
+                        }, 3000);
 
-            //     }).catch(err => {
-            //         console.log('There was an error!', err.response.data.message);
-            //         // this.setState({ errorMessage: error.message });
-            //         toast.error(err.response.data.message, {
-            //             autoClose: 4000,
-            //             hideProgressBar: false,
-            //             closeOnClick: true,
-            //             pauseOnHover: true,
-            //             draggable: true,
-            //             progress: undefined,
-            //         });
-            //         //console.log('There was an error!', err);
-            //     });
-        } else {
-            toast.error("Invlid Input", {
-                autoClose: 4000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
+                    }).catch(err => {
+                        console.log('There was an error!', err.response.data.message);
+                        // this.setState({ errorMessage: error.message });
+                        toast.error(err.response.data.message, {
+                            autoClose: 4000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                        });
+                        //console.log('There was an error!', err);
+                    });
+            } else {
+                toast.error("Invlid Input", {
+                    autoClose: 4000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
 
+            }
         }
-   }
-    },[ReceiptInfo]);
-  
-    //console.log("txs_____mandeep", txs);
-    //console.log("receipt_____2222",ReceiptInfo);
+    }, [ReceiptInfo]);
+
     useEffect(() => {
         if (Object.keys(formErrors).length === 0 && isSubmit) {
 
@@ -217,8 +212,14 @@ function AddNominee(props) {
                                                             </button>
 
                                                         </div>
-
-                                                        <ErrorMessage message={error} />
+                                                       
+                                                        {(() => {
+                                                            if (error && error == "UNPREDICTABLE_GAS_LIMIT") {
+                                                                return (
+                                                                    <h5 mt-2 className="text-center">Cannot Estimate gas Transaction may fail or may require manual gas limit</h5>
+                                                                )
+                                                            }
+                                                        })()}
                                                     </div>
                                                     {/* Content Row End*/}
                                                 </div>

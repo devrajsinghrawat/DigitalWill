@@ -30,7 +30,7 @@ import img_icon from './../infoDrive_background.png';
     
 })
     const handleChange = e => {
-        //console.log("form_data",e);
+       
         const { name, value } = e.target
         setUser({
             ...user,
@@ -44,7 +44,7 @@ import img_icon from './../infoDrive_background.png';
         if( name && email && password  && language ){
             axios.post("http://localhost:3001/addUser", user)
             .then( res => {
-                console.log("error__",res);
+              
                 toast.success("Data inserted successfully !!", {
                     position: "top-right",
                     autoClose: 4000,
@@ -60,7 +60,7 @@ import img_icon from './../infoDrive_background.png';
         
                 
             }).catch(err => {
-                console.log('There was an error!', err.response.data.message);
+              //  console.log('There was an error!', err.response.data.message);
                // this.setState({ errorMessage: error.message });
                toast.error(err.response.data.message, {
                     autoClose: 4000,

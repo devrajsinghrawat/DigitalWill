@@ -28,21 +28,19 @@ export default function Login(props) {
 
             await axios.post("http://localhost:3001/addUser", userData)
                 .then(res => {
-                    console.log("responce_____", res);
+                   
 
                 })
             const message = "Hi Mandeep";
             const signature = await signMessageAsync({ message })
-            console.log("signature____", signature);
+          
         }
         if (status === 'unauthenticated' && isConnected) {
-            console.log("tst1__",status ,isConnected);
             handleAuth()
             navigate.push('/dashboard')
 
         } else {
             //navigate.push('/signin')
-            console.log("you are not connected");
   
         }
 

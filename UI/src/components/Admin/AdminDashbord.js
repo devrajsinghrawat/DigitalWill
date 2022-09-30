@@ -16,19 +16,20 @@ import ToggleSwitch from "../Admin/Lodder/ToggleSwitch";
 import { BigNumber, FixedFormat, FixedNumber, formatFixed, parseFixed, BigNumberish } from "@ethersproject/bignumber";
 import GetOwnerAddress from "./GetOwnerAddress";
 import GetPausedStatus from "./Lodder/GetPausedStatus";
-import { themeDefault, namesOfModes } from './global'
 import GetIsAliveStatus from "./IsAlive/GetIsAliveStatus";
+import LoadingSpinner from "./Lodder/LoadingSpinner";
 // Payment send funcation
-const startPayment = async ({ setError, setTxs, ether, addr }) => {
+const DepositFund = async ({ setError, setTxs, ether, isLoading, SetReceiptInfo }) => {
   try {
     if (!window.ethereum)
       throw new Error("No crypto wallet found. Please install it.");
-
+    const addr = process.env.REACT_APP_CONTRACT_ADD;
     await window.ethereum.send("eth_requestAccounts");
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     ethers.utils.getAddress(addr);
     // Get Interface
+
     const iface = new ethers.utils.Interface(ABI);
     // Get Function data 
     const data = iface.encodeFunctionData("deposit", []);
@@ -37,14 +38,13 @@ const startPayment = async ({ setError, setTxs, ether, addr }) => {
       value: ethers.utils.parseEther(ether),
       data
     })
+    setTxs(tx);
     const receipt = await tx.wait();
-    // console.log("TXTX___", tx);
-    //console.log("okkk___", receipt);
+    SetReceiptInfo(receipt)
 
-    setTxs([tx]);
 
   } catch (err) {
-    setError(err.message);
+    setError(err.code);
   }
 };
 //Get User Blance
@@ -62,13 +62,11 @@ const GetNomineeBalance
       const signer = provider.getSigner();
 
       const AccountAdd = await signer.getAddress();
-      // console.log("Account2222:", AccountAdd);
-      ethers.utils.getAddress("0xd104fD11eAA70f0092bf449e0963FC21C070ED82");
-      const iface = new ethers.Contract("0xd104fD11eAA70f0092bf449e0963FC21C070ED82", ABI, signer);
+      ethers.utils.getAddress(process.env.REACT_APP_CONTRACT_ADD);
+      const iface = new ethers.Contract(process.env.REACT_APP_CONTRACT_ADD, ABI, signer);
       try {
         //const userd = await iface.getNominee();
         const userd = await iface.userBalance(AccountAdd);
-        //console.log("man___bl22", userd);
         let vr = BigNumber.from(userd._hex);
         let nocov = vr.toString();
         const finalBalance = ethers.utils.formatEther(nocov);
@@ -76,16 +74,16 @@ const GetNomineeBalance
 
       } catch (error) {
 
-        console.log("ERROR AT GETTING USER: ", error);
+        //console.log("ERROR AT GETTING USER: ", error);
       }
 
     } catch (err) {
-      setBalanceError(err.message);
+      setBalanceError(err.code);
     }
   };
 
 // Withdrow funds
-const WithDrawFund = async ({ setError, setTxs, ether }) => {
+const WithDrawFund = async ({ setError, setTxs, ether, SetReceiptInfoWithdrw }) => {
   try {
     if (!window.ethereum)
       throw new Error("No crypto wallet found. Please install it.");
@@ -93,12 +91,12 @@ const WithDrawFund = async ({ setError, setTxs, ether }) => {
     await window.ethereum.send("eth_requestAccounts");
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
-    ethers.utils.getAddress("0xd104fD11eAA70f0092bf449e0963FC21C070ED82");
+    ethers.utils.getAddress(process.env.REACT_APP_CONTRACT_ADD);
     // Get Interface
     const iface = new ethers.utils.Interface(ABI);
 
     // Get Function data 
-    const Contadd = "0xd104fD11eAA70f0092bf449e0963FC21C070ED82";
+    const Contadd = process.env.REACT_APP_CONTRACT_ADD;
 
     const data = iface.encodeFunctionData("withdraw(uint256)", [ethers.utils.parseEther(ether)]);
 
@@ -106,19 +104,18 @@ const WithDrawFund = async ({ setError, setTxs, ether }) => {
       to: Contadd,
       data
     })
+    setTxs(tx);
     const receipt = await tx.wait();
-    //console.log("TXTX___2", tx);
-    //console.log("okkk___2", receipt);
-
-    setTxs([tx]);
+    SetReceiptInfoWithdrw(receipt);
 
   } catch (err) {
-    setError(err.message);
+    //console.log("chk___",err);
+    setError(err.code);
   }
 };
 //ProveIsAlive funcation call using EtherJs
 const GetProveIsAlive
-  = async ({ setError, setProveAlive }) => {
+  = async ({ setError, setProveAlive, SetReceiptInfoIsAlive }) => {
 
     try {
       if (!window.ethereum)
@@ -129,24 +126,22 @@ const GetProveIsAlive
       const signer = provider.getSigner();
 
       const AccountAdd = await signer.getAddress();
-      ethers.utils.getAddress("0xd104fD11eAA70f0092bf449e0963FC21C070ED82");
-      const iface = new ethers.Contract("0xd104fD11eAA70f0092bf449e0963FC21C070ED82", ABI, signer);
+      ethers.utils.getAddress(process.env.REACT_APP_CONTRACT_ADD);
+      const iface = new ethers.Contract(process.env.REACT_APP_CONTRACT_ADD, ABI, signer);
       try {
         //const nextSign = await iface.getNextSignBlock();
         const IsAliveSign = await iface.proveIsAlive();
-
-        //console.log("IsAliveSign____111", IsAliveSign);
-        // let vr = BigNumber.from(nextSign._hex);
-        //let nocov = vr.toString();
         setProveAlive(IsAliveSign);
+        const receipt = await IsAliveSign.wait();
+        SetReceiptInfoIsAlive(receipt);
 
       } catch (error) {
 
-        console.log("ERROR AT GETTING USER: ", error);
+        // console.log("ERROR AT GETTING USER: ", error);
       }
 
     } catch (err) {
-      setError(err.message);
+      setError(err.code);
     }
   };
 
@@ -169,29 +164,68 @@ function AdminDashbord(props) {
   const [BalanceError1, setBalanceError] = useState();
   const [nomBalance, setnomBalance] = useState([]);
   const [isOff, setIsOff] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [ReceiptInfo, SetReceiptInfo] = useState([]);
+  const [ReceiptInfoWithdrw, SetReceiptInfoWithdrw] = useState([]);
+  const [ReceiptInfoIsAlive, SetReceiptInfoIsAlive] = useState([]);
 
+  // Deposit Fund funcation call
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const data = new FormData(e.target);
     setError();
-    await startPayment({
+    await DepositFund({
       setError,
       setTxs,
-      ether: data.get("ether"),
-      addr: data.get("addr")
+      SetReceiptInfo,
+      isLoading,
+      ether: data.get("ether")
     });
 
   };
+  useEffect(() => {
+    if (ReceiptInfo && ReceiptInfo.status == 1) {
+      setIsLoading(false);
+      toast.success("Deposit Funds successfully!");
+      setTimeout(() => {
+        props.history.push("/dashboard");
+        window.location.reload(false);
+      }, 4000);
+      
+    }
+
+  }, [ReceiptInfo]);
+  // Deposit Fund End
+
+  // Withdraw funcation call
   const handleSubmitWithdrw = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const data = new FormData(e.target);
     setError();
     await WithDrawFund({
       setError,
       setTxs,
+      SetReceiptInfoWithdrw,
       ether: data.get("ether")
     });
   }
+  useEffect(() => {
+    if (ReceiptInfoWithdrw && ReceiptInfoWithdrw.status == 1) {
+      setIsLoading(false);
+      toast.success("WithDraw Funds successfully!");
+      setTimeout(() => {
+        props.history.push("/dashboard");
+        window.location.reload(false);
+      }, 4000);
+      
+    }
+
+  }, [ReceiptInfoWithdrw]);
+  // End WithDraw funcation End
+
+  // Get Nominee Blance
   useEffect(async () => {
     setBalanceError();
     await GetNomineeBalance({
@@ -200,15 +234,29 @@ function AdminDashbord(props) {
     });
     //console.log('mount it!');
   }, []);
+
+  // Call IsAlive Funcation
   const SubmitIsAlive = async () => {
-   // console.log("ENTR____");
     setError();
+    setIsLoading(true);
     await GetProveIsAlive({
       setError,
       setProveAlive,
+      SetReceiptInfoIsAlive,
     });
-
   };
+  useEffect(() => {
+    if (ReceiptInfoIsAlive && ReceiptInfoIsAlive.status == 1) {
+      setIsLoading(false);
+      toast.success("Prove Liveness is successfully!");
+      setTimeout(() => {
+        props.history.push("/dashboard");
+        window.location.reload(false);
+      }, 4000);
+      
+    }
+
+  }, [ReceiptInfoIsAlive]);
 
   return (
 
@@ -373,23 +421,12 @@ function AdminDashbord(props) {
                 centered
               >
                 <Modal.Header closeButton>
-                  <Modal.Title>Deposit Funds</Modal.Title>
+                  <Modal.Title></Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                   <form className="m-4" onSubmit={handleSubmit}>
                     <div className="credit-card w-full lg:w-1/2 sm:w-auto shadow-lg mx-auto rounded-xl bg-white">
                       <div className="col-sm-12 rsp">
-
-                        <div className="row">
-                          <div className="col">
-                            <label>Recipient Address</label>
-                            <input
-                              type="text"
-                              name="addr"
-                              className="form-control"
-                            />
-                          </div>
-                        </div>
                         <div className="row">
                           <div className="col">
                             <label>Amount in ETH</label>
@@ -403,13 +440,28 @@ function AdminDashbord(props) {
                           </div>
                         </div>
                         <footer className="p-4">
+                          {isLoading ? <LoadingSpinner /> : <ErrorMessage message={error} />}
                           <button
                             type="submit"
-                            className="btn btn-primary submit-button focus:ring focus:outline-none w-full"
+                            disabled={isLoading} className="btn btn-primary submit-button focus:ring focus:outline-none w-full"
                           >
-                            Pay now
+                            Deposit
                           </button>
-                          <ErrorMessage message={error} />
+                          {(() => {
+                            if (error && error == "ACTION_REJECTED") {
+                              return (
+                                <h5 mt-2 className="text-center">User Rejected Transaction</h5>
+                              )
+                            } else if (error == "INVALID_ARGUMENT") {
+                              return (
+                                <h5 mt-2 className="text-center">INVALID ARGUMENT</h5>
+                              )
+                            } else if (error == "UNPREDICTABLE_GAS_LIMIT") {
+                              return (
+                                <h5 mt-2 className="text-center">Cannot Estimate gas Transaction may fail or may require manual gas limit</h5>
+                              )
+                            }
+                          })()}
 
                         </footer>
                       </div>
@@ -450,13 +502,28 @@ function AdminDashbord(props) {
                           </div>
                         </div>
                         <footer className="p-4">
+                          {isLoading ? <LoadingSpinner /> : <ErrorMessage message={error} />}
                           <button
                             type="submit"
-                            className="btn btn-primary submit-button focus:ring focus:outline-none w-full"
+                            disabled={isLoading} className="btn btn-primary submit-button focus:ring focus:outline-none w-full"
                           >
                             Withdraw now
                           </button>
-                          <ErrorMessage message={error} />
+                          {(() => {
+                            if (error && error == "ACTION_REJECTED") {
+                              return (
+                                <h5 mt-2 className="text-center">User Rejected Transaction</h5>
+                              )
+                            } else if (error == "INVALID_ARGUMENT") {
+                              return (
+                                <h5 mt-2 className="text-center">INVALID ARGUMENT</h5>
+                              )
+                            } else if (error == "UNPREDICTABLE_GAS_LIMIT") {
+                              return (
+                                <h5 mt-2 className="text-center">Cannot Estimate gas Transaction may fail or may require manual gas limit</h5>
+                              )
+                            }
+                          })()}
 
                         </footer>
                       </div>
@@ -466,7 +533,6 @@ function AdminDashbord(props) {
                 </Modal.Body>
               </Modal>
 
-              {/* WithDrow Funcation model */}
               <Modal
                 show={showIsAive}
                 onHide={handleCloseIsAive}
@@ -482,13 +548,28 @@ function AdminDashbord(props) {
                 <Modal.Body>
                   <GetIsAliveStatus />
                   <footer className="mb-2 text-center">
+                    {isLoading ? <LoadingSpinner /> : <ErrorMessage message={error} />}
                     <button
                       onClick={SubmitIsAlive}
-                      className="btn btn-primary submit-button focus:ring focus:outline-none w-full"
+                      disabled={isLoading} className="btn btn-primary submit-button focus:ring focus:outline-none w-full"
                     >
                       Prove Liveness
                     </button>
-                    <ErrorMessage message={error} />
+                    {(() => {
+                      if (error && error == "ACTION_REJECTED") {
+                        return (
+                          <h5 mt-2 className="text-center">User Rejected Transaction</h5>
+                        )
+                      } else if (error == "INVALID_ARGUMENT") {
+                        return (
+                          <h5 mt-2 className="text-center">INVALID ARGUMENT</h5>
+                        )
+                      } else if (error == "UNPREDICTABLE_GAS_LIMIT") {
+                        return (
+                          <h5 mt-2 className="text-center">Cannot Estimate gas Transaction may fail or may require manual gas limit</h5>
+                        )
+                      }
+                    })()}
 
                   </footer>
                 </Modal.Body>

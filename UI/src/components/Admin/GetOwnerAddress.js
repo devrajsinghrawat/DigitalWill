@@ -20,14 +20,14 @@ const GetAdminAddressFromContract
     const signer = provider.getSigner();
     
     const AccountAdd = await signer.getAddress();
-    ethers.utils.getAddress("0xd104fD11eAA70f0092bf449e0963FC21C070ED82");
-    const iface = new ethers.Contract("0xd104fD11eAA70f0092bf449e0963FC21C070ED82", ABI, signer);
+    ethers.utils.getAddress(process.env.REACT_APP_CONTRACT_ADD);
+    const iface = new ethers.Contract(process.env.REACT_APP_CONTRACT_ADD, ABI, signer);
     try {
       const userd = await iface.owner();
       setownerAd(userd); 
       localStorage.setItem('Admin', userd);
     } catch (error) {
-      console.log("ERROR AT GETTING USER: ", error);
+      //console.log("ERROR AT GETTING USER: ", error);
     }
 
   } catch (err) {

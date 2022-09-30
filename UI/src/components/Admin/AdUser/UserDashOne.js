@@ -17,13 +17,10 @@ const GetNominee = async ({ setError1, setTxs1, setnom }) => {
     await window.ethereum.send("eth_requestAccounts");
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
-    ethers.utils.getAddress("0xd104fD11eAA70f0092bf449e0963FC21C070ED82");
-    const iface = new ethers.Contract("0xd104fD11eAA70f0092bf449e0963FC21C070ED82", ABI, signer);
+    ethers.utils.getAddress(process.env.REACT_APP_CONTRACT_ADD);
+    const iface = new ethers.Contract(process.env.REACT_APP_CONTRACT_ADD, ABI, signer);
     try {
-      const userd = await iface.getNominee();
-      //const userd = await iface.userBalance("0xEe45A7dfe2EbDB8d113Ec669F2682f27DAC5Fc31");
-      //console.log("man___bl",userd); 
-
+      const userd = await iface.getNominee(); 
       var loopData = [];
       let totalCount = [];
       var i;
@@ -42,7 +39,7 @@ const GetNominee = async ({ setError1, setTxs1, setnom }) => {
 
     } catch (error) {
 
-      console.log("ERROR AT GETTING USER: ", error);
+     // console.log("ERROR AT GETTING USER: ", error);
     }
 
   } catch (err) {
@@ -50,32 +47,28 @@ const GetNominee = async ({ setError1, setTxs1, setnom }) => {
   }
 };
 // Delete Nominee
-const NomineeDelete = async ({ setErrorDlt, setTxsDlt, nomVl, SetReceiptInfo }) => {
+const NomineeDelete = async ({ setErrorDlt, setTxsDlt, nomVl, SetReceiptInfo}) => {
   try {
     if (!window.ethereum)
       throw new Error("No crypto wallet found. Please install it.");
-    console.log("ENter___Delete_");
     await window.ethereum.send("eth_requestAccounts");
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
-    ethers.utils.getAddress("0xd104fD11eAA70f0092bf449e0963FC21C070ED82");
+    ethers.utils.getAddress(process.env.REACT_APP_CONTRACT_ADD);
     // Get Interface
-    console.log("ENter___signer_",signer);
     const iface = new ethers.utils.Interface(ABI);
     const data = iface.encodeFunctionData("removeNominee(address,address)", [nomVl,"0x0000000000000000000000000000000000000000"]);
-    console.log("ENter___sdata_",data);
     const tx = await signer.sendTransaction({
-      to: "0xd104fD11eAA70f0092bf449e0963FC21C070ED82",
+      to: process.env.REACT_APP_CONTRACT_ADD,
       data
     });
     const receipt = await tx.wait();
     setTxsDlt(tx);
     SetReceiptInfo(receipt);
-    //console.log("TST1__Done",tx);
-    //console.log("TST2__Done",receipt);
+   
   } catch (err) {
-    console.log("TST1__Error",err);
     setErrorDlt(err.message);
+    
   }
 };
 const UserDashOne = (props) => {
@@ -95,7 +88,7 @@ const UserDashOne = (props) => {
       setTxs1,
       setnom
     });
-    //console.log('mount it!');
+    
   }, []);
   const UserId = localStorage.getItem("id");
   const [notes, getNotes] = useState(
@@ -113,7 +106,6 @@ const UserDashOne = (props) => {
   const getAllNotes = () => {
     axios.post(url, { UserPublicKey: UserId })
       .then((response) => {
-        //console.log("JJJ11122___",response);
         const allNotes = response.data.data.count;
         const allNotes2 = response.data.data.data;
 
@@ -124,7 +116,6 @@ const UserDashOne = (props) => {
   }
   //function GetBtnValue(event) {
   const GetBtnValue = async (event) => {
-    //console.log("kkkkkkkkkkkkkkk______",event.target.value);
     setErrorDlt();
     setIsLoading(true);
     await NomineeDelete({
@@ -133,15 +124,16 @@ const UserDashOne = (props) => {
       SetReceiptInfo,
       nomVl: event.target.value,
     });
-    setIsLoading(true);
+    setIsLoading(false);
   }
   useEffect(() => {
     if (ReceiptInfo && ReceiptInfo.status == 1) {
+      setIsLoading(false);
       toast.success("Nominee Delete successfully!");
       setTimeout(() => {
         props.history.push("/dashboard");
-      }, 2000);
-      setIsLoading(false);
+      }, 3000);
+      window.location.reload(false);
     }
   }, [ReceiptInfo]);
   //Using useToggle Hook
@@ -181,7 +173,7 @@ const UserDashOne = (props) => {
                 )
               })}
               {isLoading ? <LoadingSpinner /> : <ErrorMessage message={error} />}
-
+            
             </table>
           </div>
         )}

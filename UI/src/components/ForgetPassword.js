@@ -27,7 +27,7 @@ export default function ForgetPassword() {
         if( email ){
             axios.post("http://localhost:3001/ForgetPwdSendEmail", user)
             .then( res => {
-                console.log("Email_send",res);
+                //console.log("Email_send",res);
                 toast.success(res.data.payload, {
                     position: "top-center",
                     autoClose: 4000,
@@ -39,7 +39,7 @@ export default function ForgetPassword() {
                 });
                 
             }).catch(err => {
-                console.log('There was an error!', err.response.data.message);
+                //console.log('There was an error!', err.response.data.message);
                // this.setState({ errorMessage: error.message });
                toast.error(err.response.data.message, {
                     autoClose: 4000,
@@ -83,7 +83,7 @@ export default function ForgetPassword() {
                         </div>
                         <div className="col-7">
                             <div className="login fgpt">
-                                { console.log("forget_Password", user) }
+            
                                 
                                 <h5>Forgot your password?</h5>
                                 <span>Enter your email address below and we'll get you back on track</span>
