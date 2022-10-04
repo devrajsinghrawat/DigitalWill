@@ -1,7 +1,7 @@
 let helper = {};
 
 helper.errorHandler = function (res, options, httpStatuCode = 501) {
-    let status = '';
+    status = '';
     if (options.status == '') {
         status = options.status;
     } else {
@@ -9,14 +9,14 @@ helper.errorHandler = function (res, options, httpStatuCode = 501) {
     }
     let obj = {
         status: status || false,
-        code: httpStatuCode,
+        code: (options && options.code) || "",
         message: (options && options.message) || 'Something went wrong',
-        data: (options && options.data) || []
+        payload: (options && options.payload) || []
     }
     res.status(httpStatuCode).json(obj);
 }
 
-helper.successHandler = function (res, options, httpStatuCode) {
+helper.successHandler = function (res, options) {
     let status = '';
     if (options.status == false) {
         status = options.status;
@@ -25,13 +25,10 @@ helper.successHandler = function (res, options, httpStatuCode) {
     }
     let obj = {
         status: status,
-        code: httpStatuCode,
+        code: (options && options.code) || "",
         message: (options && options.message) || 'Operation performed successfully',
-        data: (options && options.data) || []
+        payload: (options && options.payload) || {}
     }
-
-    console.log('obj======', obj);
-
     res.send(obj);
 }
 

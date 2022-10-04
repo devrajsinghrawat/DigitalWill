@@ -1,11 +1,11 @@
 const express 	= require('express'),
-	http 		= require('http'),
-	https 		= require('https'),
-	bodyParser	= require('body-parser'),
-	cookieParser= require('cookie-parser'),
-	path		= require('path'),
-	cors 		= require('cors'),
-	fs          = require('fs');
+		http 		= require('http'),
+		https 		= require('https'),
+		bodyParser	= require('body-parser'),
+		cookieParser= require('cookie-parser'),
+		path		= require('path'),
+		cors 		= require('cors'),
+		fs          = require('fs');
 		
 		
 //build config from params
@@ -21,6 +21,11 @@ global.app      = app;
     next();
  });
 app.use(cors());
+
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+app.use(express.static(__dirname +''));
 
 app.use(bodyParser.json())
 app.use(bodyParser.json({limit:'50mb'}));
