@@ -1,44 +1,22 @@
 {
-  "name": "server-app",
+  "name": "digitalbill",
   "version": "1.0.0",
-  "description": "Server application",
+  "description": "To save digital asset",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.js",
+     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "build": "npm run clean && cp -r src dist/src && cp -r bin dist/bin && cp *.yml dist && cp *.yaml dist && cp *.json dist && cp README.md dist && cp LICENSE dist",
-    "clean": "rimraf dist && mkdirp dist"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "EPL-2.0",
+  "license": "ISC",
   "dependencies": {
-    "bcrypt": "^5.0.1",
-    "body-parser": "^1.19.0",
-    "cookie-parser": "^1.4.5",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "docx-pdf": "^0.0.1",
-    "ejs": "^3.1.6",
     "express": "^4.18.1",
-    "fast-csv": "^4.3.6",
-    "libreoffice-convert": "^1.3.8",
-    "mongodb": "^4.4.0",
-    "multer": "^1.4.4",
     "mysql": "^2.18.1",
-    "nodemailer": "^6.6.3",
-    "passport": "^0.6.0",
-    "path": "^0.12.7",
+    "nodemon": "^2.0.19",
     "q": "^1.5.1",
-    "randomstring": "^1.2.1",
-    "request": "^2.88.2",
-    "stripe": "^8.164.0",
-    "swagger-ui-express": "^4.1.4",
-    "xlsx": "^0.18.5",
-    "yargs": "^14.2.1"
-  },
-  "devDependencies": {
-    "mkdirp": "^1.0.3",
-    "node-fetch": "^2.6.1",
-    "nodemon": "^2.0.9",
-    "rimraf": "^3.0.2"
+    "yargs": "^17.5.1"
   }
 }

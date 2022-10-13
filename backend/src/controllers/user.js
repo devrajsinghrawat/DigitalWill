@@ -1,18 +1,18 @@
 const 	userModel 	= require('../model/user'),
-		helper      = require('../helpers/index'),
-		path		= require('path');
+		helper      = require('../helpers/index');
 		
 let user = {};
+
 // User Register
 user.addUser = async function (req, res, next) {
-	console.log('Aaaaa', req.body);
-	if(req.body.email && req.body.email != ''){		
+	//console.log("req_by__",req.body);
+	if(req.body.address && req.body.address != ''){		
 		userModel.addUser(req.body).then(function (result) {
 			console.log('result : ', result);
 			if (result.status) {
 				if(result.status == true){
 					helper.successHandler(res, {
-						payload: result.message
+						data: result.message
 					}, 200);
 				} else {
 					helper.errorHandler(res, {
@@ -34,302 +34,61 @@ user.addUser = async function (req, res, next) {
 		}, 500);
 	}
 }
-// get All users list
-user.getAllUser = async function (req, res, next) {
-	//console.log("kanu___",req.body);
-	if(req.body.userId != ''){
-		
-		userModel.getAllUser(req.body).then(function (result) {			
-			if (result.status) {
-				if(result.status == true){
-					helper.successHandler(res, {
-						payload: result.message
-					}, 200);
-				} else {
-					helper.errorHandler(res, {
-						status: false,
-						message: result.message
-					}, 500);
-				}
 
-			} else {
-				helper.errorHandler(res, {
-					status: false,
-					message: result.message
-				}, 500);
-			}         
-		});
-	} else {
-		helper.errorHandler(res, {
-			status: false,
-			message: "Please provide user ID !!"
-		}, 500);
-	}
-} 
-// User login
-user.loginUser = async function (req, res, next) {	
-	if(req.body.email != '' && req.body.password != ''){		
-		userModel.loginUser(req.body).then(function (result) {
-			
-			console.log('rrrrr', result);			
-			if (result.status) {
-				if(result.status == true){
-					helper.successHandler(res, {
-						payload: result.data
-					}, 200);
-				} else {
-					helper.errorHandler(res, {
-						status: false,
-						message: result.message
-					}, 500);
-				}
-
-			} else {
-				helper.errorHandler(res, {
-					status: false,
-					message: result.message
-				}, 500);
-			}         
-		});
-	} else {
-		helper.errorHandler(res, {
-			status: false,
-			message: "Please provide login details !!"
-		}, 500);
-	}
-} 
-
-// get All users by Id
-user.getUserByUserId = async function (req, res, next) {
-	
-	if(req.body.usertoken != ''){
-		console.log(req.body);
-		userModel.getUserByUserId(req.body).then(function (result) {			
-			if (result.status) {
-				if(result.status == true){
-					helper.successHandler(res, {
-						payload: result.data
-					}, 200);
-				} else {
-					helper.errorHandler(res, {
-						status: false,
-						message: result.message
-					}, 500);
-				}
-
-			} else {
-				helper.errorHandler(res, {
-					status: false,
-					message: result.message
-				}, 500);
-			}         
-		});
-	} else {
-		helper.errorHandler(res, {
-			status: false,
-			message: "Please provide user token !!"
-		}, 500);
-	}
-} 
-
-user.updateUserRegStatus = function (req, res, next) {
-        if (req.body.id) {
-            userModel.updateUserRegStatus(req.body).then(function (result) {
+user.updateUser = function (req, res, next) {
+        if (req.body.UserPublicKey) {
+            userModel.updateUser(req.body).then(function (result) {
+				console.log(result);
                 if (result) {
-                    res.json({
-                        status: true,
-                        code: "",
-                        message: 'Operation performed successfully.',
-                        payload: {}
-                    });
+					helper.successHandler(res, {
+						data: result.data
+					}, 200);
                 } else {
-                    res.status(500).send({
-                        status: false,
-                        message: 'Failed, Please try again.',
-                        payload: {}
-                    });
+                    helper.errorHandler(res, {
+						status: false,
+						message: result.message
+					}, 500);
                 }
             });
         } else {
-            res.status(500).send({
-                status: false,
-                message: 'Something went wrong.',
-                payload: {}
-            });
+            helper.errorHandler(res, {
+				status: false,
+				message: "Something went wrong !!"
+			}, 500);
         }
 }
 
-user.updateUserStatus = function (req, res, next) {
-	if (req.body.id) {
-		userModel.updateUserStatus(req).then(function (result) {
+user.getUser = function (req, res, next) {
+	if (req.body) {
+		userModel.getUser(req.body).then(function (result) {
+			console.log(result);
 			if (result) {
-				res.json({
-					status: true,
-					code: "",
-					message: 'Operation performed successfully.',
-					payload: {}
-				});
+				helper.successHandler(res, {
+					data: result.data
+				}, 200);
 			} else {
-				res.status(500).send({
+				helper.errorHandler(res, {
 					status: false,
-					message: 'Failed, Please try again.',
-					payload: {}
-				});
+					message: result.message
+				}, 500);
 			}
 		});
 	} else {
-		res.status(500).send({
-			status: false,
-			message: 'Something went wrong.',
-			payload: {}
-		});
-	}
-}
-
-// Email Send Forget Password
-user.ForgetPwdSendEmail = async function(req, res){
-	let body = req.body;	
-	console.log("Email.....", body.email)
- 	if(req.body.email != ''){
-		userModel.ForgetPwdSendEmail(req.body).then(function (result) {
-			console.log('result : ', result);
-			if (result.status) {
-				if(result.status == true){
-						helper.successHandler(res, {
-						payload: result.message
-					}, 200);
-				} else {
-					helper.errorHandler(res, {
-						status: false,
-						message: result.message
-					}, 500);
-				}
-			} else {
-				helper.errorHandler(res, {
-					status: false,
-					message: result.message
-				}, 500);
-			}         
-		});
-	} else {
 		helper.errorHandler(res, {
 			status: false,
-			message: " Email can't be empty !!"
+			message: "Something went wrong !!"
 		}, 500);
 	}
 }
 
-
-// set Forgot Password
-user.setForgotPassword = async function(req, res){
-    let body = req.body;
-
-   	if(req.body.email && req.body.email != ''){
-		userModel.setForgotPassword(req.body).then(function (result) {
-			console.log('result : ', result.data);
-			if (result.status) {
-				if(result.status == true){
-						helper.successHandler(res, {
-						payload: result.data
-					}, 200);
-				} else {
-					helper.errorHandler(res, {
-						status: false,
-						message: result.message
-					}, 500);
-				}
-			} else {
-				helper.errorHandler(res, {
-					status: false,
-					message: result.message
-				}, 500);
-			}         
-		});
-	} else {
-		helper.errorHandler(res, {
-			status: false,
-			message: " email can't be empty !!"
-		}, 500);
-	}
-   
-  }
-  
-  //Update user password by admin
-user.UpdateUserPwdbyAdmin = async function(req, res){
-    let body = req.body;
-   //console.log("body_____",req.body);
-   	if(req.body.UserEmailId && req.body.passwordUser != ''){
-		userModel.UpdateUserPwdbyAdmin(req.body).then(function (result) {
-			console.log('result : ', result.message);
-			if (result.status) {
-				if(result.status == true){
-						helper.successHandler(res, {
-						payload: result.message
-					}, 200);
-				} else {
-					helper.errorHandler(res, {
-						status: false,
-						message: result.message
-					}, 500);
-				}
-			} else {
-				helper.errorHandler(res, {
-					status: false,
-					message: result.message
-				}, 500);
-			}         
-		});
-	} else {
-		helper.errorHandler(res, {
-			status: false,
-			message: "Password Can't be empty !!"
-		}, 500);
-	}
-
-}
-//change Password
-user.changePwd = async function(req, res){
-    let body = req.body;
-   
-   	if(req.body.email && req.body.password != ''){
-		userModel.changePwd(req.body).then(function (result) {
-			console.log('result : ', result.message);
-			if (result.status) {
-				if(result.status == true){
-						helper.successHandler(res, {
-						payload: result.message
-					}, 200);
-				} else {
-					helper.errorHandler(res, {
-						status: false,
-						message: result.message
-					}, 500);
-				}
-			} else {
-				helper.errorHandler(res, {
-					status: false,
-					message: result.message
-				}, 500);
-			}         
-		});
-	} else {
-		helper.errorHandler(res, {
-			status: false,
-			message: "Password Can't be empty !!"
-		}, 500);
-	}
-
-}
-
-// invite teammate
-user.inviteTeamMate = async function (req, res, next) {
-	if(req.body.formData && req.body.userData){		
-		userModel.inviteTeamMate(req.body).then(function (result) {
+user.AddNominee = async function (req, res, next) {
+	if(req.body.UserPublicKey && req.body.UserPublicKey != ''){		
+		userModel.AddNominee(req.body).then(function (result) {
 			console.log('result : ', result);
 			if (result.status) {
 				if(result.status == true){
 					helper.successHandler(res, {
-						payload: result.message
+						data: result.message
 					}, 200);
 				} else {
 					helper.errorHandler(res, {
@@ -348,6 +107,103 @@ user.inviteTeamMate = async function (req, res, next) {
 		helper.errorHandler(res, {
 			status: false,
 			message: "Post data empty !!"
+		}, 500);
+	}
+}
+
+user.DeleteNominee = function (req, res, next) { 
+	if (req.body.ids) {
+		user.DeleteNominee(req.body).then(function (result) {
+			if (result) {
+				helper.successHandler(res, {
+					data: result.data
+				}, 200);
+			} else {
+				helper.errorHandler(res, {
+					status: false,
+					message: result.message
+				}, 500);
+			}
+		});
+	} else {
+		helper.errorHandler(res, {
+			status: false,
+			message: "Something went wrong !!"
+		}, 500);
+	}
+}
+
+user.UpdateNominee = function (req, res, next) {
+	if (req.body.UserPublicKey) {
+		userModel.UpdateNominee(req.body).then(function (result) {
+			console.log(result);
+			if (result) {
+				helper.successHandler(res, {
+					data: result.data
+				}, 200);
+			} else {
+				helper.errorHandler(res, {
+					status: false,
+					message: result.message
+				}, 500);
+			}
+		});
+	} else {
+		helper.errorHandler(res, {
+			status: false,
+			message: "Something went wrong !!"
+		}, 500);
+	}
+}
+
+user.UserNominee = function (req, res, next) {
+	if (req.body.UserPublicKey) {
+		userModel.UserNominee(req.body).then(function (result) {
+			console.log(result);
+			if (result) {
+				helper.successHandler(res, {
+					data: {
+						count: result.message.count,
+						data: result.message.data
+					}
+				}, 200);
+			} else {
+				helper.errorHandler(res, {
+					status: false,
+					message: result.message
+				}, 500);
+			}
+		});
+	} else {
+		helper.errorHandler(res, {
+			status: false,
+			message: "Something went wrong !!"
+		}, 500);
+	}
+}
+
+user.UserNomineeByUsers = function (req, res, next) {
+	if (req.body.UserPublicKey) {
+		userModel.UserNomineeByUsers(req.body).then(function (result) {
+			console.log(result);
+			if (result) {
+				helper.successHandler(res, {
+					data: {
+						count: result.message.count,
+						data: result.message.data
+					}
+				}, 200);
+			} else {
+				helper.errorHandler(res, {
+					status: false,
+					message: result.message
+				}, 500);
+			}
+		});
+	} else {
+		helper.errorHandler(res, {
+			status: false,
+			message: "Something went wrong !!"
 		}, 500);
 	}
 }

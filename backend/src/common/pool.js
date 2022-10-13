@@ -6,7 +6,7 @@ var pool  = mysql.createPool({
     user        : "root",
     password    : "",
     port        : "",
-    database    : "infodrive"
+    database    : "digitalwill"
   });
 
 module.exports = pool;
